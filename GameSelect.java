@@ -2,7 +2,6 @@ package fanorona.com;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -14,7 +13,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 public class GameSelect extends JFrame {
-
+	
+	GameRun thegame = new GameRun();
 	private JPanel contentPane;
 
 	/**
@@ -61,8 +61,8 @@ public class GameSelect extends JFrame {
 		JButton btnHumanVsHuman = new JButton("Human vs Human");
 		btnHumanVsHuman.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				HumanVsHuman humanVsHuman = new HumanVsHuman();
-				humanVsHuman.GameTime();
+				System.out.println("Human vs Human Selected\n");
+				thegame.run_game(0);				
 				dispose();
 			}
 		});
@@ -74,6 +74,7 @@ public class GameSelect extends JFrame {
 		btnHumanVsCpu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				System.out.println("Human vs CPU Selected\n");
+				thegame.run_game(1);
 				dispose();
 			}
 		});
@@ -85,6 +86,7 @@ public class GameSelect extends JFrame {
 		btnCpuVsCpu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("CPU vs CPU Selected\n");
+				thegame.run_game(2);
 				dispose();
 			}
 		});
