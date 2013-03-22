@@ -1,6 +1,7 @@
 package fanorona.com;
 
-import java.awt.EventQueue;
+import java.awt.*;
+
 import javax.swing.JFrame;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -8,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.Font;
 import javax.swing.SwingConstants;
+import java.awt.Canvas;
 
 public class MainMenu {
 
@@ -109,6 +111,5 @@ public class MainMenu {
 		btnQuit.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		btnQuit.setBounds(169, 218, 161, 58);
 		frmMainMenu.getContentPane().add(btnQuit);
-		
 	}
 }

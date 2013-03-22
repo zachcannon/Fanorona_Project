@@ -46,7 +46,7 @@ public class Rules extends JFrame {
 		
 		// picture will only s
 		JLabel label = new JLabel("");
-		label.setIcon(new ImageIcon("C:\\Users\\Zach\\My Work\\SCHOOL!!\\CSCE_315\\Fanorona\\src\\fanorona\\com\\Rules.JPG"));
+		label.setIcon(new ImageIcon("C:\\eclipse\\Rules.JPG"));
 		label.setBounds(10, 19, 748, 372);
 		contentPane.add(label);
 		

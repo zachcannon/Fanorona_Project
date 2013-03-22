@@ -13,7 +13,7 @@ public class GameRun {
 		if(choice == 0) { //Human vs Human
 			System.out.println("Human vs Human Selected\n");
 			game_board = new Board(0);
-			game_board.game_main();
+			//game_board.game_main();
 		} else if (choice == 1) {		
 			System.out.println("Human vs Computer Selected\n");
 			game_board = new Board(1);

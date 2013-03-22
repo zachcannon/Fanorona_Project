@@ -2,6 +2,11 @@ package fanorona.com;
 
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
 import javax.swing.*;
 
 public class Board extends JPanel{
@@ -12,7 +17,7 @@ public class Board extends JPanel{
 	RED = 2;	//PLAYER 2 is red
 
 	JFrame window;
-	Canvas board_to_display;
+	String game_message;
 	BoardGraphics graphics = new BoardGraphics();
 	
 	int game_number_type;
@@ -40,7 +45,8 @@ public class Board extends JPanel{
 		}
 		
 		setup_board();
-		players_turn = 1;		
+		create_window();
+		players_turn = 1;
 	}	
 	
 	public void setup_board() {
@@ -141,7 +147,7 @@ public class Board extends JPanel{
 
 		@Override
 		public int players_turn() {
-			int move_success;
+			int move_success = 0;
 			int[] move_array = get_move();
 			
 			if(check_valid_move(move_array) == 1) {
@@ -357,43 +363,159 @@ public class Board extends JPanel{
 	
 	
 	//-------------------------------GUI--------------------------------//
-	class BoardGraphics extends Canvas {
+	class BoardGraphics extends JPanel implements ActionListener, MouseListener {
+		int width = 900;
+		int height = 600;
+		int click_counter;
+		// 0=old_x, 1=old_y, 2=new_x, 3=new_y, 4=forward or backwards(2=back, 1=forward, 0 if no take)
+		int[] move;
 		public BoardGraphics() {
-			setSize(600,900);
+			game_message = "Welcome to Fanorona! Player 1 (Black) will go first, please select a piece to move";
+			click_counter = 0;
+			move = new int[5];
+			setSize(height,width);
 			setBackground(Color.white);
 		}	
 		
-		public void paint(Graphics g) {//Display board
-			g.setColor(Color.gray);
-	    	
+		
+		public void processClick(int x, int y) {
+			// first we get point on the board the user clicked
+			System.out.println("X: "+x+" Y: "+y);
+			if (x<70 || x>790 || y <55 || y>455) {
+				System.out.println("invalid!");
+				game_message = "not valid! try again";
+				repaint();
+				return;
+			}
+			int x_no_offset = x-70;
+			int row = (int)(x_no_offset / 80);
+			int y_no_offset = y-55;
+			int col = (int)(y_no_offset / 80);
+			System.out.println("Row: "+row+" Col: "+col);
+			
+			// now we need to figure out where in the game we are at
+			// if it's the first click in a players move then we need
+			// to store "old x" and "old y" in move array
+			if (click_counter == 0) {
+				// some error checking first
+				if ((players_turn == 1 && game_board_array[row][col] == BLACK)
+					|| (players_turn == 2 && game_board_array[row][col] == RED)) {
+					move[0] = row;
+					move[1] = col;
+					click_counter++;
+					game_message = "you have selected to move ("+row+","+col+"), please select where to move";
+					repaint();
+				}
+				// if it doesn't meet the requirement then we can let them try again
+				// without updating the counter
+				else {
+					game_message = "("+row+","+col+") is a not valid peice for you!";
+					repaint();
+				}
+			}
+			// is this is click number two, this is where they want to move
+			// so we store "new x" and "new y"
+			else if (click_counter == 1) {
+				// basic error checking
+				if (game_board_array[row][col] == EMPTY) {
+					move[2] = row;
+					move[3] = col;
+					click_counter++;
+					game_message = "we are moving from ("+move[0]+","+move[1]+") to ("+row+","+col+"), please select a direction to erase (click same piece to not overtake anything)";
+					repaint();
+				}
+				// else its not a valid move
+				else {
+					game_message = "("+row+","+col+") is not empty!, select an empty place";
+					repaint();
+				}
+			} // end of click == 1
+			else if (click_counter == 2) {
+				click_counter = 0;
+				// we know that is they click the same piece they don't want to overtake
+				if (row == move[2] && col == move[3]) {
+					move[4] = 0;
+					System.out.println("not overtaking");
+				}
+				else if (row > 2) {
+					System.out.println("forward");
+					move[4] = 1;
+				}
+				else {
+					System.out.println("backwards");
+					move[4] = 2;
+				}
+				if (players_turn == 1) {
+					if (player_1.check_valid_move(move) == 1) {
+						player_1.execute_move(move);
+						players_turn = 2;
+						game_message = "Player 2 (Red) select a piece to move";
+						repaint();
+					}
+					else {
+						game_message = "That is not a valid move! Player 1 (black) select a peice to move";
+						repaint();
+					}
+				}
+				else {
+					if (player_2.check_valid_move(move) == 1) {
+						player_2.execute_move(move);
+						players_turn = 1;
+						game_message = "Player 1 (Black) select a piece to move";
+						repaint();
+					}
+					else {
+						game_message = "That is not a valid move! Player 2 (red) select a peice to move";
+						repaint();
+					}
+				}
+			} // end of click == 2
+		}// end of processClick
+		
+		public void paintComponent(Graphics g) {//Display board
+			// 'erase' previous message
+			g.setColor(Color.white);
+			g.fillRect(0, 480, width, 100);
+			g.setColor(Color.black);
+			g.setFont(new  Font("Serif", Font.BOLD, 14));
+			g.drawString(game_message, 40, 500);
 	        for(int i = 0; i<5; i++) {
 	        	for(int j = 0; j<9; j++) {
-	        		if(game_board_array[i][j] == RED) {
+	        		if(game_board_array[j][i] == RED) {
 	        			g.setColor(Color.red);
-	        			g.fillOval(125+75*j, 100+75*i, 40, 40);
-	        		} else if(game_board_array[i][j] == BLACK) {
+	        			g.fillOval(90+80*j, 75+80*i, 40, 40);
+	        		} else if(game_board_array[j][i] == BLACK) {
 	        			g.setColor(Color.black);
-	        			g.fillOval(125+75*j, 100+75*i, 40, 40);
+	        			g.fillOval(90+80*j, 75+80*i, 40, 40);
 	        		} else {
 	        			g.setColor(Color.gray);
-	        			g.fillOval(125+75*j, 100+75*i, 40, 40);
+	        			g.fillOval(90+80*j, 75+80*i, 40, 40);
 	        		}	        		
 	        	}	        		        
 	        }	        
 		}
+
+		public void mousePressed(MouseEvent e) {
+			System.out.println("mouse pressed");
+			processClick(e.getX(), e.getY());
+		}
+		
+		public void mouseClicked(MouseEvent e) {}
+		public void mouseEntered(MouseEvent e) {}
+		public void mouseExited(MouseEvent e) {}
+		public void mouseReleased(MouseEvent e) {}
+		public void actionPerformed(ActionEvent e) {}
 	}
 	
 	public void create_window() {
-		window = new JFrame("Fanorona"); 
-	    
+		window = new JFrame("Fanorona");
 		window.setTitle("Fanorona Game");
 		window.setBounds(100, 100, 900, 600);
 		window.setResizable(false);
 		window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);		
 		window.setVisible(true);
 		window.add(graphics);
-	
+		graphics.addMouseListener(graphics);
 	}
-		
 }
 
