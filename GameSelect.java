@@ -61,7 +61,7 @@ public class GameSelect extends JFrame {
 		JButton btnHumanVsHuman = new JButton("Human vs Human");
 		btnHumanVsHuman.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("Human vs Human Selected\n");
+				//System.out.println("Human vs Human Selected\n");
 				thegame.run_game(0);				
 				dispose();
 			}
@@ -73,7 +73,7 @@ public class GameSelect extends JFrame {
 		JButton btnHumanVsCpu = new JButton("Human vs CPU");
 		btnHumanVsCpu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				System.out.println("Human vs CPU Selected\n");
+				//System.out.println("Human vs CPU Selected\n");
 				thegame.run_game(1);
 				dispose();
 			}
@@ -85,7 +85,7 @@ public class GameSelect extends JFrame {
 		JButton btnCpuVsCpu = new JButton("CPU vs CPU");
 		btnCpuVsCpu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("CPU vs CPU Selected\n");
+				//System.out.println("CPU vs CPU Selected\n");
 				thegame.run_game(2);
 				dispose();
 			}
