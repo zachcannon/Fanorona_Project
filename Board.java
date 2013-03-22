@@ -88,7 +88,7 @@ public class Board extends JPanel{
 		//!!!!!!!!!!!!!!!!!!!! SHOW BOARD GUI
 		
 		while (true) { //Repeats until the window is closed or a break is called (in check game over)
-			if (players_turn == 1) {				
+			if (players_turn == 1) {	//BLACK'S TURN			
 				int move_success = player_1.players_turn();
 				if (move_success == 1) {
 					players_turn = 2;
@@ -98,7 +98,7 @@ public class Board extends JPanel{
 
 			if (check_end_of_game() == 1) break;
 			
-			if (players_turn == 2) {
+			if (players_turn == 2) {	//RED'S TURN
 				int move_success = player_2.players_turn();
 				if (move_success == 1) {
 					players_turn = 1;
@@ -123,9 +123,10 @@ public class Board extends JPanel{
 		
 		public abstract int players_turn(); //Return 1 for successful move, return 0 for invalid move choice
 		
-		public abstract int[] get_move();	//Returns four numbers in an array - 0=old_x, 1=old_y, 2=new_x, 3=new_y, 4=forward or backwards(0=back, 1=forward
+		public abstract int[] get_move();	//Returns four numbers in an array - 0=old_x, 1=old_y, 2=new_x, 3=new_y, 4=forward or backwards(2=back, 1=forward, 0 if no take)
 		public abstract int check_valid_move(int[] array_of_moves); //Checks if moves in array_of_moves are valid, returns 1 if good, returns 0 is invalid
 		public abstract void execute_move(int[] array_of_moves);
+		public abstract void erase_pieces(int new_x, int new_y, int compass_direction, int direction_to_take);
 	}
 	
 	public class Human_Player extends Player{
@@ -178,7 +179,128 @@ public class Board extends JPanel{
 
 		@Override
 		public void execute_move(int[] array_of_moves) {
-			// TODO Auto-generated method stub
+			int old_x = array_of_moves[0];
+			int old_y = array_of_moves[1];
+			int new_x = array_of_moves[2];
+			int new_y = array_of_moves[3];
+			int direction_to_take = array_of_moves[4];
+			
+			game_board_array[old_x][old_y] = EMPTY;
+			game_board_array[new_x][new_y] = players_turn;
+			
+			int compass_direction; //corresponds to 1-8 for direction of move with 1=north, 2=northeast, 3=east...
+			if(old_x < new_x) { //East move		
+				if(old_y < new_y) { //NORTH
+					compass_direction = 2;
+				} else if (old_y > new_y){
+					compass_direction = 4;
+				} else {
+					compass_direction = 3;
+				}
+			} else if (old_x > new_x) { //West move
+				if(old_y < new_y) { //NORTH
+					compass_direction = 8;
+				} else if (old_y > new_y){ //South
+					compass_direction = 6;
+				} else {
+					compass_direction = 7;
+				}
+			} else { //NORTH OR SOUTH
+				if(old_y < new_y) { //NORTH
+					compass_direction = 1;
+				} else {
+					compass_direction = 5;
+				}
+			}
+			
+			erase_pieces(new_x, new_y, compass_direction, direction_to_take);			
+		}
+
+		@Override
+		public void erase_pieces(int new_x, int new_y, int compass_direction, int direction_to_take) {
+			if (direction_to_take == 0) return;
+			
+			if (compass_direction == 1) { //NORTH
+				if (direction_to_take == 1) {//Forward take
+					for(int i = new_y+1; i<5; i++) {
+						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn) {
+							game_board_array[new_x][i] = EMPTY;
+						} else {
+							break;
+						}
+					}
+				} else {
+					for(int i = new_y-2; i>=0; i--) {
+						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn) {
+							game_board_array[new_x][i] = EMPTY;
+						} else {
+							break;
+						}
+					}
+				}
+			} else if (compass_direction == 2) { //NORTHEAST
+				//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! NORTHEAST MOVE				
+			} else if (compass_direction == 3) { //EAST
+				if (direction_to_take == 1) {//Forward take
+					for(int i = new_x+1; i<9; i++) {
+						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn) {
+							game_board_array[new_x][i] = EMPTY;
+						} else {
+							break;
+						}
+					}
+				} else {
+					for(int i = new_x-2; i>=0; i--) {
+						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn) {
+							game_board_array[new_x][i] = EMPTY;
+						} else {
+							break;
+						}
+					}
+				}
+			} else if (compass_direction == 4) { //SOUTHEAST
+				//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! SOUTHEAST MOVE	
+			} else if (compass_direction == 5) { //SOUTH
+				if (direction_to_take == 1) {//Forward take
+					for(int i = new_y-1; i>=0; i--) {
+						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn) {
+							game_board_array[new_x][i] = EMPTY;
+						} else {
+							break;
+						}
+					}
+				} else {
+					for(int i = new_y+2; i<5; i++) {
+						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn) {
+							game_board_array[new_x][i] = EMPTY;
+						} else {
+							break;
+						}
+					}
+				}				
+			} else if (compass_direction == 6) { //SOUTHWEST
+				//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! SOUTHWEST MOVE	
+			} else if (compass_direction == 7) { //WEST
+				if (direction_to_take == 1) {//Forward take
+					for(int i = new_x-1; i>=0; i--) {
+						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn) {
+							game_board_array[new_x][i] = EMPTY;
+						} else {
+							break;
+						}
+					}
+				} else {
+					for(int i = new_x+2; i<9; i++) { //NORTHWEST
+						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn) {
+							game_board_array[new_x][i] = EMPTY;
+						} else {
+							break;
+						}
+					}
+				}	
+			} else {
+				//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! NORTHWEST MOVE	
+			}
 			
 		}
 
@@ -220,6 +342,15 @@ public class Board extends JPanel{
 			// TODO Auto-generated method stub
 			
 		}
+
+		@Override
+		public void erase_pieces(int new_x, int new_y, int compass_direction,
+				int direction_to_take) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		
 				
 
 	}
@@ -263,14 +394,6 @@ public class Board extends JPanel{
 		window.add(graphics);
 	
 	}
-	
-	public int[] get_move() {
-		int [] move = {0,0};
-		return move;
-	}
-	
-	
-	
+		
 }
-
 
