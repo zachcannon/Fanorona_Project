@@ -379,6 +379,53 @@ public class Board extends JPanel{
 		
 		
 		public void processClick(int x, int y) {
+			
+			if (click_counter == 2) {
+				click_counter = 0;
+				/* g.drawRect(425, 500, 100, 25);
+	        	g.drawRect(550, 500, 100, 25);
+	        	g.drawRect(675, 500, 100, 25);
+	        	*/
+				if (x > 425 && x < 525 && y > 500 && y < 525) {
+					move[4] = 1;
+				}
+				else if (x > 550 && x < 650 && y > 500 && y < 525) {
+					move[4] = 2;
+				}
+				else if (x > 675 && x < 775 && y > 500 && y < 525) {
+					move[4] = 0;
+				}
+				else {
+					game_message = "Please select a direction to take";
+					repaint();
+					return;
+				}
+				if (players_turn == 1) {
+					if (player_1.check_valid_move(move) == 1) {
+						player_1.execute_move(move);
+						players_turn = 2;
+						game_message = "Player 2 (Red) select a piece to move";
+						repaint();
+					}
+					else {
+						game_message = "That is not a valid move! Player 1 (black) select a peice to move";
+						repaint();
+					}
+				}
+				else {
+					if (player_2.check_valid_move(move) == 1) {
+						player_2.execute_move(move);
+						players_turn = 1;
+						game_message = "Player 1 (Black) select a piece to move";
+						repaint();
+					}
+					else {
+						game_message = "That is not a valid move! Player 2 (red) select a peice to move";
+						repaint();
+					}
+				}
+			} // end of click == 2
+			
 			// first we get point on the board the user clicked
 			System.out.println("X: "+x+" Y: "+y);
 			if (x<70 || x>790 || y <55 || y>455) {
@@ -421,7 +468,9 @@ public class Board extends JPanel{
 					move[2] = row;
 					move[3] = col;
 					click_counter++;
-					game_message = "we are moving from ("+move[0]+","+move[1]+") to ("+row+","+col+"), please select a direction to erase (click same piece to not overtake anything)";
+					// we need to update the game_message and let the user select a direction
+					// if we moving in the same row, we can either go up or down
+					game_message = "moving ("+move[0]+","+move[1]+") to ("+row+","+col+") Please select a direction";
 					repaint();
 				}
 				// else its not a valid move
@@ -430,55 +479,54 @@ public class Board extends JPanel{
 					repaint();
 				}
 			} // end of click == 1
-			else if (click_counter == 2) {
-				click_counter = 0;
-				// we know that is they click the same piece they don't want to overtake
-				if (row == move[2] && col == move[3]) {
-					move[4] = 0;
-					System.out.println("not overtaking");
-				}
-				else if (row > 2) {
-					System.out.println("forward");
-					move[4] = 1;
-				}
-				else {
-					System.out.println("backwards");
-					move[4] = 2;
-				}
-				if (players_turn == 1) {
-					if (player_1.check_valid_move(move) == 1) {
-						player_1.execute_move(move);
-						players_turn = 2;
-						game_message = "Player 2 (Red) select a piece to move";
-						repaint();
-					}
-					else {
-						game_message = "That is not a valid move! Player 1 (black) select a peice to move";
-						repaint();
-					}
-				}
-				else {
-					if (player_2.check_valid_move(move) == 1) {
-						player_2.execute_move(move);
-						players_turn = 1;
-						game_message = "Player 1 (Black) select a piece to move";
-						repaint();
-					}
-					else {
-						game_message = "That is not a valid move! Player 2 (red) select a peice to move";
-						repaint();
-					}
-				}
-			} // end of click == 2
+			
 		}// end of processClick
 		
 		public void paintComponent(Graphics g) {//Display board
-			// 'erase' previous message
+			// 'erase' previous message, and put in new message
 			g.setColor(Color.white);
 			g.fillRect(0, 480, width, 100);
 			g.setColor(Color.black);
 			g.setFont(new  Font("Serif", Font.BOLD, 14));
 			g.drawString(game_message, 40, 500);
+			
+			// draw the vertical lines
+	        g.setColor(Color.black);
+	        for (int i=0; i<9; ++i) {
+	        	g.drawLine(110+80*i, 95, 110+80*i, 415);
+	        }
+	        // draw horizontal lines
+	        for (int i=0; i<5; ++i) {
+	        	g.drawLine(110, 95+80*i, 750, 95+80*i);
+	        }
+			// draw slanted (top left to bottom right) lines
+	        for (int i=0; i<4; ++i) {
+	        	if (i == 0 || i == 2) {
+	        		for (int j=0; j<4; ++j) {
+	        			g.drawLine(110+160*j, 95+80*i, 190+160*j, 175+80*i);
+	        		}
+	        	}
+	        	else {
+	        		for (int j = 0; j<4; ++j) {
+	        			g.drawLine(190+160*j, 95+80*i, 270+160*j, 175+80*i);
+	        		}
+	        	}
+	        }
+	        // draw more slanted lines
+	        for (int i=0; i<4; ++i) {
+	        	if (i == 0 || i == 2) {
+	        		for (int j=0; j<4; ++j) {
+	        			g.drawLine(190+160*j, 175+80*i, 270+160*j, 95+80*i);
+	        		}
+	        	}
+	        	else {
+	        		for (int j = 0; j<4; ++j) {
+	        			g.drawLine(110+160*j, 175+80*i, 190+160*j, 95+80*i);
+	        		}
+	        	}
+	        }
+	        
+			// draw the game pieces
 	        for(int i = 0; i<5; i++) {
 	        	for(int j = 0; j<9; j++) {
 	        		if(game_board_array[j][i] == RED) {
@@ -487,12 +535,21 @@ public class Board extends JPanel{
 	        		} else if(game_board_array[j][i] == BLACK) {
 	        			g.setColor(Color.black);
 	        			g.fillOval(90+80*j, 75+80*i, 40, 40);
-	        		} else {
-	        			g.setColor(Color.gray);
-	        			g.fillOval(90+80*j, 75+80*i, 40, 40);
-	        		}	        		
+	        		} else if(game_board_array[j][i] == EMPTY) {
+	        			// draw nothing
+	        		}
 	        	}	        		        
-	        }	        
+	        }
+	        
+	        if (click_counter == 2) {
+	        	g.setColor(Color.black);
+	        	g.drawRect(425, 500, 100, 25);
+	        	g.drawRect(550, 500, 100, 25);
+	        	g.drawRect(675, 500, 100, 25);
+	        	g.drawString("Forward", 450, 515);
+	        	g.drawString("Backward", 575, 515);
+	        	g.drawString("No Take", 700, 515);
+	        }
 		}
 
 		public void mousePressed(MouseEvent e) {
