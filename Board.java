@@ -486,33 +486,52 @@ public class Board extends JPanel{
 		
 		public void processClick(int x, int y) {
 			
+			// if the game is over we don't want to do anything
+			if (check_end_of_game() != 0) {
+				return;
+			}
+			
+			// if this is a direction selection click we only want to
+			// take a click inside the "buttons"
 			if (click_counter == 2) {
-				click_counter = 0;
-				/* g.drawRect(425, 500, 100, 25);
+				/* bounds for buttons:
+				g.drawRect(425, 500, 100, 25);
 	        	g.drawRect(550, 500, 100, 25);
 	        	g.drawRect(675, 500, 100, 25);
 	        	*/
 				if (x > 425 && x < 525 && y > 500 && y < 525) {
 					move[4] = 1;
+					click_counter = 0;
 				}
 				else if (x > 550 && x < 650 && y > 500 && y < 525) {
 					move[4] = 2;
+					click_counter = 0;
 				}
 				else if (x > 675 && x < 775 && y > 500 && y < 525) {
 					move[4] = 0;
+					click_counter = 0;
 				}
 				else {
-					game_message = "Please select a direction to take";
+					game_message = "Please select a direction to take.";
 					repaint();
 					return;
 				}
 				if (players_turn == 1) {
 					if (player_1.check_valid_move(move) == 1) {
 						player_1.execute_move(move);
-						players_turn = 2;
-						game_message = "Player 2 (Red) select a piece to move";
-						repaint();
-						return;
+						if (check_end_of_game() == 1) {
+							// player 1 has won the game yay
+							game_message = "Player 1 is the winner!";
+							repaint();
+							return;
+						}
+						else {
+							// else its player two's turn
+							players_turn = 2;
+							game_message = "Player 2 (Red) select a piece to move";
+							repaint();
+							return;
+						}
 					}
 					else {
 						game_message = "That is not a valid move! Player 1 (black) select a peice to move";
@@ -523,10 +542,19 @@ public class Board extends JPanel{
 				else {
 					if (player_2.check_valid_move(move) == 1) {
 						player_2.execute_move(move);
-						players_turn = 1;
-						game_message = "Player 1 (Black) select a piece to move";
-						repaint();
-						return;
+						if (check_end_of_game() == 2) {
+							//player 2 won yay
+							game_message = "Player 2 has won the game!";
+							repaint();
+							return;
+						}
+						else {
+							// else its player one's turn
+							players_turn = 1;
+							game_message = "Player 1 (Black) select a piece to move";
+							repaint();
+							return;
+						}
 					}
 					else {
 						game_message = "That is not a valid move! Player 2 (red) select a peice to move";
@@ -536,7 +564,7 @@ public class Board extends JPanel{
 				}
 			} // end of click == 2
 			
-			// first we get point on the board the user clicked
+			// otherwise we find was point was clicked on the board
 			System.out.println("X: "+x+" Y: "+y);
 			if (x<70 || x>790 || y <55 || y>455) {
 				System.out.println("invalid!");
@@ -575,12 +603,24 @@ public class Board extends JPanel{
 			else if (click_counter == 1) {
 				// basic error checking
 				if (game_board_array[row][col] == EMPTY) {
+					// crazy complicated error checking
+					// if the point we are sums up to be odd we can only move N, S, E, W
+					// for example (0, 1) would be only be able to move N, W, E, W
+					// since 0+1 = 1 and 1 is odd
+					if ((move[0]+move[1])%2 == 1) {
+						//since we can only move in the same col or row
+						//if BOTH row and col change then its an invalid move
+						if (move[0] != row && move[1] != col) {
+							game_message = "No line to move along, please select a valid empty spot to move ("+move[0]+","+move[1]+")";
+							repaint();
+							return;
+						}
+					}
 					move[2] = row;
 					move[3] = col;
 					click_counter++;
 					// we need to update the game_message and let the user select a direction
-					// if we moving in the same row, we can either go up or down
-					game_message = "moving ("+move[0]+","+move[1]+") to ("+row+","+col+") Please select a direction";
+					game_message = "moving ("+move[0]+","+move[1]+") to ("+row+","+col+") Please select a direction to take.";
 					repaint();
 				}
 				// else its not a valid move
@@ -598,7 +638,7 @@ public class Board extends JPanel{
 			g.fillRect(0, 0, width, height);
 			g.setColor(Color.black);
 			g.setFont(new  Font("Serif", Font.BOLD, 14));
-			g.drawString(game_message, 40, 500);
+			g.drawString(game_message, 40, 490);
 			
 			// draw the vertical lines
 	        g.setColor(Color.black);
