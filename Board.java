@@ -490,8 +490,18 @@ public class Board extends JPanel{
 		
 		public void processClick(int x, int y) {
 			
-			// if the game is over we don't want to do anything
+			// if the game is over we only want to display the message
+			// and then exit the function
 			if (check_end_of_game() != 0) {
+				if (check_end_of_game() == 1) {
+					// player 1 has won the game yay
+					game_message = "Player 1 is the winner!";
+				}
+				else {
+					//player 2 won yay
+					game_message = "Player 2 has won the game!";
+				}
+				repaint();
 				return;
 			}
 			
@@ -592,7 +602,7 @@ public class Board extends JPanel{
 					move[0] = row;
 					move[1] = col;
 					click_counter++;
-					game_message = "you have selected to move ("+row+","+col+"), please select where to move";
+					game_message = "You have selected to move ("+row+","+col+"), please select where to move. Click this piece again to select another piece to move";
 					repaint();
 				}
 				// if it doesn't meet the requirement then we can let them try again
@@ -605,6 +615,20 @@ public class Board extends JPanel{
 			// is this is click number two, this is where they want to move
 			// so we store "new x" and "new y"
 			else if (click_counter == 1) {
+				// if the user clicks the same piece we want to start over
+				if (row == move[0] && col == move[1]) {
+					click_counter = 0;
+					if (players_turn == 1) {
+						game_message = "Player 1 (Black) Select a piece to move";
+						repaint();
+						return;
+					}
+					else {
+						game_message = "Player 2 (Red) Select a piece to move";
+						repaint();
+						return;
+					}
+				}
 				// basic error checking
 				if (game_board_array[row][col] == EMPTY) {
 					// crazy complicated error checking
