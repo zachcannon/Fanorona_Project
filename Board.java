@@ -477,6 +477,7 @@ public class Board extends JPanel{
 		int width = 900;
 		int height = 600;
 		int click_counter;
+		int extra_turn_flag = 0;
 		// 0=old_x, 1=old_y, 2=new_x, 3=new_y, 4=forward or backwards(2=back, 1=forward, 0 if no take)
 		int[] move;
 		public BoardGraphics() {
@@ -505,6 +506,21 @@ public class Board extends JPanel{
 				return;
 			}
 			
+			// if they click the pass button change players
+			if (click_counter == 0 && extra_turn_flag == 1 && x > 425 && x < 525 && y > 500 && y < 525) {
+				if (players_turn == 1) {
+					players_turn = 2;
+					extra_turn_flag = 0;
+					game_message = "Player 2 (Red) select a piece to move";
+				}
+				else {
+					players_turn = 1;
+					extra_turn_flag = 0;
+					game_message = "Player 1 (Black) select a piece to move";
+				}
+				repaint();
+				return;
+			}
 			// if this is a direction selection click we only want to
 			// take a click inside the "buttons"
 			if (click_counter == 2) {
@@ -533,19 +549,15 @@ public class Board extends JPanel{
 				if (players_turn == 1) {
 					if (player_1.check_valid_move(move) == 1) {
 						player_1.execute_move(move);
-						if (check_end_of_game() == 1) {
-							// player 1 has won the game yay
-							game_message = "Player 1 is the winner!";
-							repaint();
-							return;
+						if (extra_turn_flag == 1) {
+							game_message = "Player 1 (Black) select a piece to move or pass";
 						}
 						else {
-							// else its player two's turn
 							players_turn = 2;
 							game_message = "Player 2 (Red) select a piece to move";
-							repaint();
-							return;
 						}
+						repaint();
+						return;
 					}
 					else {
 						game_message = "That is not a valid move! Player 1 (black) select a peice to move";
@@ -556,19 +568,16 @@ public class Board extends JPanel{
 				else {
 					if (player_2.check_valid_move(move) == 1) {
 						player_2.execute_move(move);
-						if (check_end_of_game() == 2) {
-							//player 2 won yay
-							game_message = "Player 2 has won the game!";
-							repaint();
-							return;
+						// else its player one's turn
+						if (extra_turn_flag == 1) {
+							game_message = "Player 2 (Red) select a piece to move or pass";
 						}
 						else {
-							// else its player one's turn
 							players_turn = 1;
 							game_message = "Player 1 (Black) select a piece to move";
-							repaint();
-							return;
 						}
+						repaint();
+						return;
 					}
 					else {
 						game_message = "That is not a valid move! Player 2 (red) select a peice to move";
@@ -719,6 +728,13 @@ public class Board extends JPanel{
 	        	}	        		        
 	        }
 	        
+	        // draw pass button
+	        if (click_counter == 0 && extra_turn_flag == 1) {
+	        	g.setColor(Color.black);
+	        	g.drawRect(425, 500, 100, 25);
+	        	g.drawString("Pass", 450, 515);
+	        }
+	        // draw take options
 	        if (click_counter == 2) {
 	        	g.setColor(Color.black);
 	        	g.drawRect(425, 500, 100, 25);
