@@ -26,6 +26,8 @@ public class Board extends JPanel{
 	public int[][] game_board_array; //Set up in a [x][y] coordinate with [0][0] being the bottom left
 	int players_turn;
 	
+	int extra_turn_flag;
+	
 	
 	//----------------------------MAIN_GAME----------------------------//	
 	public Board(int number_type) { //Constructor
@@ -46,6 +48,7 @@ public class Board extends JPanel{
 		
 		setup_board();
 		create_window();
+		extra_turn_flag = 0;
 		players_turn = 1;
 	}	
 	
@@ -88,37 +91,7 @@ public class Board extends JPanel{
 		if(black_num == 0) return 1;
 		else if(red_num == 0) return 2;
 		else return 0;
-	}
-	
-	/*public void game_main() {//Main logic
-		
-		//!!!!!!!!!!!!!!!!!!!! SHOW BOARD GUI
-		
-		while (true) { //Repeats until the window is closed or a break is called (in check game over)
-			if (players_turn == 1) {	//BLACK'S TURN			
-				int move_success = player_1.players_turn();
-				if (move_success == 1) {
-					players_turn = 2;
-				}
-				//!!!!!!!!!!!!!!!!!!!!!!! REPRINT BOARD
-			}
-
-			if (check_end_of_game() == 1) break;
-			
-			if (players_turn == 2) {	//RED'S TURN
-				int move_success = player_2.players_turn();
-				if (move_success == 1) {
-					players_turn = 1;
-				}
-				//!!!!!!!!!!!!!!!!!!!!!!! REPRINT BOARD
-			}
-			
-			if (check_end_of_game() == 1) break;
-		}
-		
-		//!!!!!!!!!!!!!!!!!!!!!!!!! POP UP WITH WHO WON
-	}*/
-	
+	}	
 	
 	//---------------------------PLAYER_CLASS--------------------------//
 	
@@ -145,27 +118,6 @@ public class Board extends JPanel{
 		
 		public int get_who_i_am() {return who_am_i;}
 		public int get_what_i_am() {return what_am_i;}
-
-		/*@Override
-		public int players_turn() {
-			int move_success = 0;
-			int[] move_array = get_move();
-			
-			if(check_valid_move(move_array) == 1) {
-				execute_move(move_array);
-				move_success = 1;
-			} else {
-				//!!!!!!!!!!!!!!!PRINT OUT NOT A VALID MOVE
-				move_success = 0;
-			}			
-			return move_success;
-		}*/
-
-		/*@Override
-		public int[] get_move() {
-			// TODO Auto-generated method stub
-			return null;
-		}*/
 
 		@Override
 		public int check_valid_move(int[] array_of_moves) {	
@@ -240,6 +192,7 @@ public class Board extends JPanel{
 					for(int i = new_y-1; i>=0; i--) {
 						if(i<0) break;
 						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn) {
+							extra_turn_flag = 1;
 							game_board_array[new_x][i] = EMPTY;
 						} else {
 							break;
@@ -248,6 +201,7 @@ public class Board extends JPanel{
 				} else {
 					for(int i = new_y+2; i < 5; i++) {
 						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn) {
+							extra_turn_flag = 1;
 							game_board_array[new_x][i] = EMPTY;
 						} else {
 							break;
@@ -259,6 +213,7 @@ public class Board extends JPanel{
 					for(int i = 1; i<9; i++) {
 						if(new_x+i < 9 && new_y-i > 0) {
 							if(game_board_array[new_x+i][new_y-i] != EMPTY && game_board_array[new_x+i][new_y-i] != players_turn) {
+								extra_turn_flag = 1;
 								game_board_array[new_x+i][new_y-i] = EMPTY;
 							} else {
 								break;
@@ -271,6 +226,7 @@ public class Board extends JPanel{
 					for(int i = 2; i<9; i++) {
 						if(new_x-i >= 0 && new_y+i < 5) {
 							if(game_board_array[new_x-i][new_y+i] != EMPTY && game_board_array[new_x-i][new_y+i] != players_turn) {
+								extra_turn_flag = 1;
 								game_board_array[new_x-i][new_y+i] = EMPTY;
 							} else {
 								break;
@@ -286,6 +242,7 @@ public class Board extends JPanel{
 					for(int i = new_x+1; i<9; i++) {
 						if(i<0) break;
 						if(game_board_array[i][new_y] != EMPTY && game_board_array[i][new_y] != players_turn) {
+							extra_turn_flag = 1;
 							game_board_array[i][new_y] = EMPTY;
 						} else {
 							break;
@@ -294,6 +251,7 @@ public class Board extends JPanel{
 				} else {
 					for(int i = new_x-2; i >=0; i--) {
 						if(game_board_array[i][new_y] != EMPTY && game_board_array[i][new_y] != players_turn) {
+							extra_turn_flag = 1;
 							game_board_array[i][new_y] = EMPTY;
 						} else {
 							break;
@@ -305,6 +263,7 @@ public class Board extends JPanel{
 					for(int i = 1; i<9; i++) {
 						if(new_x+i < 9 && new_y+i < 5) {
 							if(game_board_array[new_x+i][new_y+i] != EMPTY && game_board_array[new_x+i][new_y+i] != players_turn) {
+								extra_turn_flag = 1;
 								game_board_array[new_x+i][new_y+i] = EMPTY;
 							} else {
 								break;
@@ -317,6 +276,7 @@ public class Board extends JPanel{
 					for(int i = 2; i<9; i++) {
 						if(new_x-i >= 0 && new_y-i >= 0) {
 							if(game_board_array[new_x-i][new_y-i] != EMPTY && game_board_array[new_x-i][new_y-i] != players_turn) {
+								extra_turn_flag = 1;
 								game_board_array[new_x-i][new_y-i] = EMPTY;
 							} else {
 								break;
@@ -331,6 +291,7 @@ public class Board extends JPanel{
 					for(int i = new_y+1; i<5; i++) {
 						if(i<0) break;
 						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn) {
+							extra_turn_flag = 1;
 							game_board_array[new_x][i] = EMPTY;
 						} else {
 							break;
@@ -339,6 +300,7 @@ public class Board extends JPanel{
 				} else {
 					for(int i = new_y-2; i >=0; i--) {
 						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn) {
+							extra_turn_flag = 1;
 							game_board_array[new_x][i] = EMPTY;
 						} else {
 							break;
@@ -350,6 +312,7 @@ public class Board extends JPanel{
 					for(int i = 1; i<9; i++) {
 						if(new_x-i >= 0 && new_y+i < 5) {
 							if(game_board_array[new_x-i][new_y+i] != EMPTY && game_board_array[new_x-i][new_y+i] != players_turn) {
+								extra_turn_flag = 1;
 								game_board_array[new_x-i][new_y+i] = EMPTY;
 							} else {
 								break;
@@ -362,6 +325,7 @@ public class Board extends JPanel{
 					for(int i = 2; i<9; i++) {
 						if(new_x+i < 9 && new_y-i >= 0) {
 							if(game_board_array[new_x+i][new_y-i] != EMPTY && game_board_array[new_x+i][new_y-i] != players_turn) {
+								extra_turn_flag = 1;
 								game_board_array[new_x+i][new_y-i] = EMPTY;
 							} else {
 								break;
@@ -376,6 +340,7 @@ public class Board extends JPanel{
 					for(int i = new_x-1; i>=0; i--) {
 						if(i<0) break;
 						if(game_board_array[i][new_y] != EMPTY && game_board_array[i][new_y] != players_turn) {
+							extra_turn_flag = 1;
 							game_board_array[i][new_y] = EMPTY;
 						} else {
 							break;
@@ -384,6 +349,7 @@ public class Board extends JPanel{
 				} else {
 					for(int i = new_x+2; i <9; i++) {
 						if(game_board_array[i][new_y] != EMPTY && game_board_array[i][new_y] != players_turn) {
+							extra_turn_flag = 1;
 							game_board_array[i][new_y] = EMPTY;
 						} else {
 							break;
@@ -395,6 +361,7 @@ public class Board extends JPanel{
 					for(int i = 1; i<9; i++) {
 						if(new_x-i >= 0 && new_y-i >= 0) {
 							if(game_board_array[new_x-i][new_y-i] != EMPTY && game_board_array[new_x-i][new_y-i] != players_turn) {
+								extra_turn_flag = 1;
 								game_board_array[new_x-i][new_y-i] = EMPTY;
 							} else {
 								break;
@@ -407,6 +374,7 @@ public class Board extends JPanel{
 					for(int i = 2; i<9; i++) {
 						if(new_x+i < 9 && new_y+i < 5) {
 							if(game_board_array[new_x+i][new_y+i] != EMPTY && game_board_array[new_x+i][new_y+i] != players_turn) {
+								extra_turn_flag = 1;
 								game_board_array[new_x+i][new_y+i] = EMPTY;
 							} else {
 								break;
@@ -418,10 +386,7 @@ public class Board extends JPanel{
 				}	
 			}
 			
-		}
-
-		
-		
+		}		
 		
 	}
 
@@ -434,18 +399,6 @@ public class Board extends JPanel{
 		
 		public int get_who_i_am() {return who_am_i;}
 		public int get_what_i_am() {return what_am_i;}
-
-		/*@Override
-		public int players_turn() {
-			// TODO Auto-generated method stub
-			return 0;
-		}*/
-
-		/*@Override
-		public int[] get_move() {
-			// TODO Auto-generated method stub
-			return null;
-		}*/
 
 		@Override
 		public int check_valid_move(int[] array_of_moves) {
@@ -465,19 +418,14 @@ public class Board extends JPanel{
 			// TODO Auto-generated method stub
 			
 		}
-
-		
-				
-
-	}
-	
+	}	
 	
 	//-------------------------------GUI--------------------------------//
 	class BoardGraphics extends JPanel implements ActionListener, MouseListener {
 		int width = 900;
 		int height = 600;
 		int click_counter;
-		int extra_turn_flag = 0;
+		
 		// 0=old_x, 1=old_y, 2=new_x, 3=new_y, 4=forward or backwards(2=back, 1=forward, 0 if no take)
 		int[] move;
 		public BoardGraphics() {
@@ -529,6 +477,7 @@ public class Board extends JPanel{
 	        	g.drawRect(550, 500, 100, 25);
 	        	g.drawRect(675, 500, 100, 25);
 	        	*/
+				extra_turn_flag = 0;
 				if (x > 425 && x < 525 && y > 500 && y < 525) {
 					move[4] = 1;
 					click_counter = 0;
@@ -557,6 +506,7 @@ public class Board extends JPanel{
 							game_message = "Player 2 (Red) select a piece to move";
 						}
 						repaint();
+						
 						return;
 					}
 					else {
@@ -577,6 +527,7 @@ public class Board extends JPanel{
 							game_message = "Player 1 (Black) select a piece to move";
 						}
 						repaint();
+						
 						return;
 					}
 					else {
