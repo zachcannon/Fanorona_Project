@@ -73,14 +73,18 @@ public class GameSelect extends JFrame {
 				//System.out.println("Human vs Human Selected\n");
 				cols = txtColumns.getText();
 				rows = txtRows.getText();
-				if (cols == "Columns" || cols == "") {
+				if (cols.equals("Columns") || cols.equals("")) {
 					cols_ = 9;
 				}
-				if (rows == "Rows" || rows == "") {
+				else {
+					cols_ = Integer.parseInt(cols);
+				}
+				if (rows.equals("Rows") || rows.equals("")) {
 					rows_ = 5;
 				}
-				cols_ = Integer.parseInt(cols);
-				rows_ = Integer.parseInt(rows);
+				else {
+					rows_ = Integer.parseInt(rows);
+				}
 				thegame.run_game(0, cols_, rows_);				
 				dispose();
 			}
@@ -95,14 +99,18 @@ public class GameSelect extends JFrame {
 				//System.out.println("Human vs CPU Selected\n");
 				cols = txtColumns.getText();
 				rows = txtRows.getText();
-				if (cols == "Columns" || cols == "") {
+				if (cols.equals("Columns") || cols.equals("")) {
 					cols_ = 9;
 				}
-				if (rows == "Rows" || rows == "") {
+				else {
+					cols_ = Integer.parseInt(cols);
+				}
+				if (rows.equals("Rows") || rows.equals("")) {
 					rows_ = 5;
 				}
-				cols_ = Integer.parseInt(cols);
-				rows_ = Integer.parseInt(rows);
+				else {
+					rows_ = Integer.parseInt(rows);
+				}
 				thegame.run_game(1, cols_, rows_);
 				dispose();
 			}
@@ -117,14 +125,18 @@ public class GameSelect extends JFrame {
 				//System.out.println("CPU vs CPU Selected\n");
 				cols = txtColumns.getText();
 				rows = txtRows.getText();
-				if (cols == "Columns" || cols == "") {
+				if (cols.equals("Columns") || cols.equals("")) {
 					cols_ = 9;
 				}
-				if (rows == "Rows" || rows == "") {
+				else {
+					cols_ = Integer.parseInt(cols);
+				}
+				if (rows.equals("Rows") || rows.equals("")) {
 					rows_ = 5;
 				}
-				cols_ = Integer.parseInt(cols);
-				rows_ = Integer.parseInt(rows);
+				else {
+					rows_ = Integer.parseInt(rows);
+				}
 				thegame.run_game(2, cols_, rows_);
 				dispose();
 			}

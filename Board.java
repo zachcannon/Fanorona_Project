@@ -62,36 +62,38 @@ public class Board extends JPanel{
 	}	
 	
 	public void setup_board() {
-		for(int i = 0; i<9; i++) {
-			for(int j = 0; j<2; j++) {				
+		for(int i = 0; i<columns; i++) {
+			for(int j = 0; j<(rows/2); j++) {				
 				game_board_array[i][j] = BLACK;
 			}
 		}
 		
-		for(int i = 0; i<9; i++) {
-			for(int j = 3; j<5; j++) {				
+		for(int i = 0; i<columns; i++) {
+			for(int j = (rows/2 + 1); j<rows; j++) {				
 				game_board_array[i][j] = RED;
 			}
 		}
 		
-		game_board_array[0][2] = BLACK;
-		game_board_array[1][2] = RED;
-		game_board_array[2][2] = BLACK;
-		game_board_array[3][2] = RED;
-		game_board_array[4][2] = EMPTY;
-		game_board_array[5][2] = BLACK;
-		game_board_array[6][2] = RED;
-		game_board_array[7][2] = BLACK;
-		game_board_array[8][2] = RED;
-	
+		for (int i=0; i<columns; ++i) {
+			if (i == (columns/2)) {
+				game_board_array[i][(rows/2)] = EMPTY;
+			}
+			else if (i<(columns/2) && i%2 == 0 || i>(columns/2) && i%2 == 1) {
+				game_board_array[i][(rows/2)] = BLACK;
+			}
+			else {
+				game_board_array[i][(rows/2)] = RED;
+			}
+		}
+		
 	}
 	
 	public int check_end_of_game() { //Returns 0 if fail, 1 if game over red wins, 2 if game over black wins
 		int black_num = 0;
 		int red_num = 0;
 		
-		for(int i = 0; i<9; i++) {
-			for(int j = 0; j<5; j++) {				
+		for(int i = 0; i<columns; i++) {
+			for(int j = 0; j<rows; j++) {				
 				if(game_board_array[i][j] == RED) red_num++;
 				if(game_board_array[i][j] == BLACK) black_num++;
 			}
@@ -463,18 +465,56 @@ public class Board extends JPanel{
 				return;
 			}
 			
+			// if its a CPU's turn we need to execute its move
+			if (players_turn == 1 && player_1.get_what_i_am() == 1 && click_counter == 0) {
+				player_1.execute_move(new int[4]);
+				players_turn = 2;
+				if (player_2.get_what_i_am() == 1) {
+					game_message = "CPU Player Two's turn, click anywhere to execute it's move";
+				}
+				else {
+					game_message = "Player 1 (Black) please select a piece to move";
+				}
+				repaint();
+				return;
+			}
+			if (players_turn == 2 && player_2.get_what_i_am() == 1 && click_counter == 0) {
+				player_2.execute_move(new int[4]);
+				players_turn = 1;
+				if (player_1.get_what_i_am() == 1) {
+					game_message = "CPU Player One's turn, click anywhere to execute it's move";
+				}
+				else {
+					game_message = "Player 1 (Black) please select a piece to move";
+				}
+				repaint();
+				return;
+			}
+			
+			
 			// if they click the pass button change players
-			if (click_counter == 0 && extra_turn_flag == 1 && x > 425 && x < 525 && y > 500 && y < 525) {
+			if (click_counter == 1 && extra_turn_flag == 1 && x > 425 && x < 525 && y > 500 && y < 525) {
 				if (players_turn == 1) {
 					players_turn = 2;
 					extra_turn_flag = 0;
-					game_message = "Player 2 (Red) select a piece to move";
+					if (player_2.get_what_i_am() == 1) {
+						game_message = "CPU Player Two's turn, click anywhere to execute it's move";
+					}
+					else {
+						game_message = "Player 2 (Red) select a piece to move";
+					}
 				}
 				else {
 					players_turn = 1;
 					extra_turn_flag = 0;
-					game_message = "Player 1 (Black) select a piece to move";
+					if (player_2.get_what_i_am() == 1) {
+						game_message = "CPU Player One's turn, click anywhere to execute it's move";
+					}
+					else {
+						game_message = "Player 1 (Black) select a piece to move";
+					}
 				}
+				click_counter = 0;
 				repaint();
 				return;
 			}
@@ -508,7 +548,11 @@ public class Board extends JPanel{
 					if (player_1.check_valid_move(move) == 1) {
 						player_1.execute_move(move);
 						if (extra_turn_flag == 1) {
-							game_message = "Player 1 (Black) select a piece to move or pass";
+							// the player took some pieces they get to go again
+							game_message = "Player 1 (Black) select where to move ("+move[0]+","+move[1]+") or pass";
+							move[0] = move[2];
+							move[1] = move[3];
+							click_counter = 1;
 						}
 						else {
 							players_turn = 2;
@@ -529,7 +573,11 @@ public class Board extends JPanel{
 						player_2.execute_move(move);
 						// else its player one's turn
 						if (extra_turn_flag == 1) {
-							game_message = "Player 2 (Red) select a piece to move or pass";
+							// the player took some pieces they get to go again
+							game_message = "Player 2 (Red) select where to move ("+move[2]+","+move[3]+") or pass";
+							move[0] = move[2];
+							move[1] = move[3];
+							click_counter = 1;
 						}
 						else {
 							players_turn = 1;
@@ -643,43 +691,43 @@ public class Board extends JPanel{
 			
 			// draw the vertical lines
 	        g.setColor(Color.black);
-	        for (int i=0; i<9; ++i) {
+	        for (int i=0; i<columns; ++i) {
 	        	g.drawLine(110+80*i, 95, 110+80*i, 415);
 	        }
 	        // draw horizontal lines
-	        for (int i=0; i<5; ++i) {
+	        for (int i=0; i<rows; ++i) {
 	        	g.drawLine(110, 95+80*i, 750, 95+80*i);
 	        }
 			// draw slanted (top left to bottom right) lines
-	        for (int i=0; i<4; ++i) {
-	        	if (i == 0 || i == 2) {
-	        		for (int j=0; j<4; ++j) {
+	        for (int i=0; i<(rows-1); ++i) {
+	        	if (i%2 == 0) {
+	        		for (int j=0; j<(columns/2); ++j) {
 	        			g.drawLine(110+160*j, 95+80*i, 190+160*j, 175+80*i);
 	        		}
 	        	}
 	        	else {
-	        		for (int j = 0; j<4; ++j) {
+	        		for (int j = 0; j<(columns/2); ++j) {
 	        			g.drawLine(190+160*j, 95+80*i, 270+160*j, 175+80*i);
 	        		}
 	        	}
 	        }
 	        // draw more slanted lines
-	        for (int i=0; i<4; ++i) {
-	        	if (i == 0 || i == 2) {
-	        		for (int j=0; j<4; ++j) {
+	        for (int i=0; i<(rows-1); ++i) {
+	        	if (i%2 == 0) {
+	        		for (int j=0; j<(columns/2); ++j) {
 	        			g.drawLine(190+160*j, 175+80*i, 270+160*j, 95+80*i);
 	        		}
 	        	}
 	        	else {
-	        		for (int j = 0; j<4; ++j) {
+	        		for (int j = 0; j<(columns/2); ++j) {
 	        			g.drawLine(110+160*j, 175+80*i, 190+160*j, 95+80*i);
 	        		}
 	        	}
 	        }
 	        
 			// draw the game pieces
-	        for(int i = 0; i<5; i++) {
-	        	for(int j = 0; j<9; j++) {
+	        for(int i = 0; i<rows; i++) {
+	        	for(int j = 0; j<columns; j++) {
 	        		if(game_board_array[j][i] == RED) {
 	        			g.setColor(Color.red);
 	        			g.fillOval(90+80*j, 75+80*i, 40, 40);
@@ -693,7 +741,7 @@ public class Board extends JPanel{
 	        }
 	        
 	        // draw pass button
-	        if (click_counter == 0 && extra_turn_flag == 1) {
+	        if (click_counter == 1 && extra_turn_flag == 1) {
 	        	g.setColor(Color.black);
 	        	g.drawRect(425, 500, 100, 25);
 	        	g.drawString("Pass", 450, 515);
