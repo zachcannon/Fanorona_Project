@@ -142,8 +142,99 @@ public class Board extends JPanel{
 			
 			if(game_board_array[new_x][new_y] != 0) return 0; //If the position to move to is not empty
 			
+			// a player can move left/right as long there is nothing in their path
+			if (new_y == old_y) {
+				if (new_x > old_x) {
+					for (int i=old_x+1; i<=new_x; ++i) {
+						if (game_board_array[i][old_y] != EMPTY) {
+							return 0;
+						}
+					}
+				}
+				else {
+					for (int i=new_x; i<old_x; ++i) {
+						if (game_board_array[i][old_y] != EMPTY) {
+							return 0;
+						}
+					}
+				}
+			}
+			
+			// a player can move up or down as long there is nothing in their path 
+			if (new_x == old_x) {
+				if (new_y > old_y) {
+					for (int i=old_y+1; i<=new_y; ++i) {
+						if (game_board_array[old_x][i] != EMPTY) {
+							return 0;
+						}
+					}
+				}
+				else {
+					for (int i=new_y; i<old_y; ++i) {
+						if (game_board_array[old_x][i] != EMPTY) {
+							return 0;
+						}
+					}
+				}
+			}
+			
+			// if the player moves diagonally then they must move in a 45 degree angle
+			// and no pieces must be in their path
+			if (new_x < old_x && new_y < old_y) { // moving NW
+				// can only move 90 degrees
+				if ((old_x-new_x) != (old_y-new_y)) {
+					return 0;
+				}
+				// check along the diagonal
+				for (int i=new_x; i<old_x; ++i) {
+					int j = new_y+(i-new_x);
+					if (game_board_array[i][j] != EMPTY) {
+						return 0;
+					}
+				}
+			}
+			if (new_x > old_x && new_y < old_y) { // moving NE
+				// can only move 90 degrees
+				if ((new_x-old_x) != (old_y-new_y)) {
+					return 0;
+				}
+				// check along diagonal
+				for (int i=old_x+1; i<=new_x; ++i) {
+					int j = new_y+(i-(old_x+1));
+					if (game_board_array[i][j] != EMPTY) {
+						return 0;
+					}
+				}
+			}
+			if (new_x < old_x && new_y > old_y) { // moving SW
+				// can only move 90 degrees
+				if ((old_x-new_x) != (new_y-old_y)) {
+					return 0;
+				}
+				// check diagonal
+				for (int i=new_x; i<old_x; ++i) {
+					int j = (old_y+1)+(i-new_x);
+					if (game_board_array[i][j] != EMPTY) {
+						return 0;
+					}
+				}
+			}
+			if (new_x > old_x && new_y > old_y) { // moving SE
+				// can only move 90 degrees
+				if ((new_x-old_x) != (new_y-old_y)) {
+					return 0;
+				}
+				// check diagonal
+				for (int i=old_x+1; i<=new_x; ++i) {
+					int j = (old_y+1)+(i-(old_x+1));
+					if (game_board_array[i][j] != EMPTY) {
+						return 0;
+					}
+				}
+			}
 			//THE REST OF THE GAME MECHANICS
 			
+			// yay it's valid
 			return 1;
 		}
 
@@ -556,7 +647,13 @@ public class Board extends JPanel{
 						}
 						else {
 							players_turn = 2;
-							game_message = "Player 2 (Red) select a piece to move";
+							//check if player 2 is a CPU
+							if (player_2.get_what_i_am() == 1) {
+								game_message = "CPU Player Two's turn, click anywhere to execute it's move";
+							}
+							else {
+								game_message = "Player 2 (Red) select a piece to move";
+							}
 						}
 						repaint();
 						
@@ -686,8 +783,10 @@ public class Board extends JPanel{
 			g.drawString(game_message, 40, 490);
 			
 			// calculate time elapsed and print it
-			int seconds =  (int) (((new Date()).getTime()-starting_time)/1000);
-			g.drawString(seconds+" s", 800, 20);
+			int total_seconds =  (int) (((new Date()).getTime()-starting_time)/1000);
+			int minutes = total_seconds/60;
+			int seconds = total_seconds-minutes*60;
+			g.drawString(minutes+":"+seconds, 800, 20);
 			
 			// draw the vertical lines
 	        g.setColor(Color.black);
