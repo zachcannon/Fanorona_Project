@@ -11,11 +11,19 @@ import javax.swing.SwingConstants;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JTextField;
 
 public class GameSelect extends JFrame {
 	
 	GameRun thegame = new GameRun();
 	private JPanel contentPane;
+	private JTextField txtColumns;
+	private JTextField txtRows;
+	
+	int cols_;
+	int rows_;
+	String cols;
+	String rows;
 
 	/**
 	 * Launch the application.
@@ -38,6 +46,7 @@ public class GameSelect extends JFrame {
 	 */
 	public GameSelect() {
 		
+		
 		// This window is to allow the user to choose which
 		// game mode he wants to play
 		
@@ -52,7 +61,7 @@ public class GameSelect extends JFrame {
 		JLabel lblSelectGameType = new JLabel("Select Game Type");
 		lblSelectGameType.setHorizontalAlignment(SwingConstants.CENTER);
 		lblSelectGameType.setFont(new Font("Tahoma", Font.BOLD, 16));
-		lblSelectGameType.setBounds(10, 11, 275, 45);
+		lblSelectGameType.setBounds(10, 0, 275, 45);
 		contentPane.add(lblSelectGameType);
 		
 		// Human vs Human button
@@ -62,7 +71,17 @@ public class GameSelect extends JFrame {
 		btnHumanVsHuman.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//System.out.println("Human vs Human Selected\n");
-				thegame.run_game(0);				
+				cols = txtColumns.getText();
+				rows = txtRows.getText();
+				if (cols == "Columns" || cols == "") {
+					cols_ = 9;
+				}
+				if (rows == "Rows" || rows == "") {
+					rows_ = 5;
+				}
+				cols_ = Integer.parseInt(cols);
+				rows_ = Integer.parseInt(rows);
+				thegame.run_game(0, cols_, rows_);				
 				dispose();
 			}
 		});
@@ -74,7 +93,17 @@ public class GameSelect extends JFrame {
 		btnHumanVsCpu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				//System.out.println("Human vs CPU Selected\n");
-				thegame.run_game(1);
+				cols = txtColumns.getText();
+				rows = txtRows.getText();
+				if (cols == "Columns" || cols == "") {
+					cols_ = 9;
+				}
+				if (rows == "Rows" || rows == "") {
+					rows_ = 5;
+				}
+				cols_ = Integer.parseInt(cols);
+				rows_ = Integer.parseInt(rows);
+				thegame.run_game(1, cols_, rows_);
 				dispose();
 			}
 		});
@@ -86,11 +115,33 @@ public class GameSelect extends JFrame {
 		btnCpuVsCpu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//System.out.println("CPU vs CPU Selected\n");
-				thegame.run_game(2);
+				cols = txtColumns.getText();
+				rows = txtRows.getText();
+				if (cols == "Columns" || cols == "") {
+					cols_ = 9;
+				}
+				if (rows == "Rows" || rows == "") {
+					rows_ = 5;
+				}
+				cols_ = Integer.parseInt(cols);
+				rows_ = Integer.parseInt(rows);
+				thegame.run_game(2, cols_, rows_);
 				dispose();
 			}
 		});
 		btnCpuVsCpu.setBounds(10, 183, 275, 45);
 		contentPane.add(btnCpuVsCpu);
+		
+		txtColumns = new JTextField();
+		txtColumns.setText("Columns");
+		txtColumns.setBounds(10, 40, 86, 20);
+		contentPane.add(txtColumns);
+		txtColumns.setColumns(10);
+		
+		txtRows = new JTextField();
+		txtRows.setText("Rows");
+		txtRows.setBounds(199, 40, 86, 20);
+		contentPane.add(txtRows);
+		txtRows.setColumns(10);
 	}
 }

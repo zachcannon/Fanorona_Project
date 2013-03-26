@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Date;
 
 import javax.swing.*;
 
@@ -23,17 +24,25 @@ public class Board extends JPanel{
 	int game_number_type;
 	Player player_1;
 	Player player_2;
+	int columns;
+	int rows;
 	public int[][] game_board_array; //Set up in a [x][y] coordinate with [0][0] being the bottom left
 	int players_turn;
 	
 	int extra_turn_flag;
 	
+	long starting_time;
+	
 	
 	//----------------------------MAIN_GAME----------------------------//	
-	public Board(int number_type) { //Constructor
-		game_board_array = new int[9][5]; //[x][y] so [0-8][0-4] possible choices
+	public Board(int number_type, int cols, int rows_) { //Constructor
+		columns = cols;
+		rows = rows_;
+		
+		game_board_array = new int[columns][rows]; //[x][y] so [0-8][0-4] possible choices
 		
 		game_number_type = number_type;
+		
 		
 		if (number_type == 0) {
 			player_1 = new Human_Player(1,0); //Player 1, human black
@@ -628,6 +637,10 @@ public class Board extends JPanel{
 			g.setFont(new  Font("Serif", Font.BOLD, 14));
 			g.drawString(game_message, 40, 490);
 			
+			// calculate time elapsed and print it
+			int seconds =  (int) (((new Date()).getTime()-starting_time)/1000);
+			g.drawString(seconds+" s", 800, 20);
+			
 			// draw the vertical lines
 	        g.setColor(Color.black);
 	        for (int i=0; i<9; ++i) {
@@ -716,6 +729,7 @@ public class Board extends JPanel{
 		window.setResizable(false);
 		window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);		
 		window.setVisible(true);
+		starting_time = (new Date()).getTime();
 		window.add(graphics);
 		graphics.addMouseListener(graphics);
 	}
