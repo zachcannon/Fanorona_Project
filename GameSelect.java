@@ -85,6 +85,18 @@ public class GameSelect extends JFrame {
 				else {
 					rows_ = Integer.parseInt(rows);
 				}
+				if (cols_ <= 0 || cols_ > 13) {
+					cols_ = 9;
+				}
+				if (rows_ <= 0 || rows_ > 13) {
+					rows_ = 9;
+				}
+				if (cols_ == 2 || cols_ == 4 || cols_ == 6 || cols_ == 8 || cols_ == 10 ||cols_ == 12 ) {
+					cols_ = cols_+1;
+				}
+				if (rows_ == 2 || rows_ == 4 || rows_ == 6 || rows_ == 8 || rows_ == 10 ||rows_ == 12 ) {
+					rows_ = rows_+1;
+				}
 				thegame.run_game(0, cols_, rows_);				
 				dispose();
 			}
@@ -111,7 +123,19 @@ public class GameSelect extends JFrame {
 				else {
 					rows_ = Integer.parseInt(rows);
 				}
-				thegame.run_game(1, cols_, rows_);
+				if (cols_ <= 0 || cols_ > 13) {
+					cols_ = 9;
+				}
+				if (rows_ <= 0 || rows_ > 13) {
+					rows_ = 9;
+				}
+				if (cols_ == 2 || cols_ == 4 || cols_ == 6 || cols_ == 8 || cols_ == 10 ||cols_ == 12 ) {
+					cols_ = cols_+1;
+				}
+				if (rows_ == 2 || rows_ == 4 || rows_ == 6 || rows_ == 8 || rows_ == 10 ||rows_ == 12 ) {
+					rows_ = rows_+1;
+				}
+				thegame.run_game(1, cols_, rows_);				
 				dispose();
 			}
 		});
@@ -137,7 +161,19 @@ public class GameSelect extends JFrame {
 				else {
 					rows_ = Integer.parseInt(rows);
 				}
-				thegame.run_game(2, cols_, rows_);
+				if (cols_ <= 0 || cols_ > 13) {
+					cols_ = 9;
+				}
+				if (rows_ <= 0 || rows_ > 13) {
+					rows_ = 9;
+				}
+				if (cols_ == 2 || cols_ == 4 || cols_ == 6 || cols_ == 8 || cols_ == 10 ||cols_ == 12 ) {
+					cols_ = cols_+1;
+				}
+				if (rows_ == 2 || rows_ == 4 || rows_ == 6 || rows_ == 8 || rows_ == 10 ||rows_ == 12 ) {
+					rows_ = rows_+1;
+				}
+				thegame.run_game(2, cols_, rows_);				
 				dispose();
 			}
 		});

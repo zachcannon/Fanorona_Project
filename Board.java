@@ -109,29 +109,12 @@ public class Board extends JPanel{
 	public abstract class Player {
 		public int who_am_i; //Corresponds to board colors above in line ~10
 		public int what_am_i; //Corresponds to human or comp. 0=human, 1=comp
-		public abstract int get_who_i_am();
-		public abstract int get_what_i_am();
-		
-		//public abstract int players_turn(); //Return 1 for successful move, return 0 for invalid move choice
-		
-		//public abstract int[] get_move();	//Returns four numbers in an array - 0=old_x, 1=old_y, 2=new_x, 3=new_y, 4=forward or backwards(2=back, 1=forward, 0 if no take)
-		public abstract int check_valid_move(int[] array_of_moves); //Checks if moves in array_of_moves are valid, returns 1 if good, returns 0 is invalid
-		public abstract void execute_move(int[] array_of_moves);
-		public abstract void erase_pieces(int new_x, int new_y, int compass_direction, int direction_to_take);
-	}
-	
-	public class Human_Player extends Player{
-		
-		public Human_Player(int player_number, int player_type) {
-			who_am_i = player_number;
-			what_am_i = player_type;
-		}
 		
 		public int get_who_i_am() {return who_am_i;}
 		public int get_what_i_am() {return what_am_i;}
-
-		@Override
-		public int check_valid_move(int[] array_of_moves) {	
+		
+		public abstract void execute_move(int[] array_of_moves);
+		public int check_valid_move(int[] array_of_moves) {	 //Checks if moves in array_of_moves are valid, returns 1 if good, returns 0 is invalid
 			int old_x = array_of_moves[0];
 			int old_y = array_of_moves[1];
 			int new_x = array_of_moves[2];
@@ -237,6 +220,217 @@ public class Board extends JPanel{
 			// yay it's valid
 			return 1;
 		}
+		public void erase_pieces(int new_x, int new_y, int compass_direction, int direction_to_take) {
+			if (direction_to_take == 0) return;
+			
+			if (compass_direction == 1) { //NORTH --DONE!!!
+				if (direction_to_take == 1) {//Forward take					
+					for(int i = new_y-1; i>=0; i--) {
+						if(i<0) break;
+						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn) {
+							extra_turn_flag = 1;
+							game_board_array[new_x][i] = EMPTY;
+						} else {
+							break;
+						}
+					}
+				} else {
+					for(int i = new_y+2; i < rows; i++) {
+						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn) {
+							extra_turn_flag = 1;
+							game_board_array[new_x][i] = EMPTY;
+						} else {
+							break;
+						}
+					}
+				}
+			} else if (compass_direction == 2) { //NORTHEAST
+				if (direction_to_take == 1) {
+					for(int i = 1; i<columns; i++) {
+						if(new_x+i < columns && new_y-i > 0) {
+							if(game_board_array[new_x+i][new_y-i] != EMPTY && game_board_array[new_x+i][new_y-i] != players_turn) {
+								extra_turn_flag = 1;
+								game_board_array[new_x+i][new_y-i] = EMPTY;
+							} else {
+								break;
+							}
+						} else {
+							break;
+						}
+					}
+				} else {
+					for(int i = 2; i<columns; i++) {
+						if(new_x-i >= 0 && new_y+i < rows) {
+							if(game_board_array[new_x-i][new_y+i] != EMPTY && game_board_array[new_x-i][new_y+i] != players_turn) {
+								extra_turn_flag = 1;
+								game_board_array[new_x-i][new_y+i] = EMPTY;
+							} else {
+								break;
+							}
+						} else {
+							break;
+						}
+					}
+				}
+				
+			} else if (compass_direction == 3) { //EAST--DONE!!!
+				if (direction_to_take == 1) {//Forward take					
+					for(int i = new_x+1; i<columns; i++) {
+						if(i<0) break;
+						if(game_board_array[i][new_y] != EMPTY && game_board_array[i][new_y] != players_turn) {
+							extra_turn_flag = 1;
+							game_board_array[i][new_y] = EMPTY;
+						} else {
+							break;
+						}
+					}
+				} else {
+					for(int i = new_x-2; i >=0; i--) {
+						if(game_board_array[i][new_y] != EMPTY && game_board_array[i][new_y] != players_turn) {
+							extra_turn_flag = 1;
+							game_board_array[i][new_y] = EMPTY;
+						} else {
+							break;
+						}
+					}
+				}
+			} else if (compass_direction == 4) { //SOUTHEAST
+				if (direction_to_take == 1) {
+					for(int i = 1; i<columns; i++) {
+						if(new_x+i < columns && new_y+i < rows) {
+							if(game_board_array[new_x+i][new_y+i] != EMPTY && game_board_array[new_x+i][new_y+i] != players_turn) {
+								extra_turn_flag = 1;
+								game_board_array[new_x+i][new_y+i] = EMPTY;
+							} else {
+								break;
+							}
+						} else {
+							break;
+						}
+					}
+				} else {
+					for(int i = 2; i<columns; i++) {
+						if(new_x-i >= 0 && new_y-i >= 0) {
+							if(game_board_array[new_x-i][new_y-i] != EMPTY && game_board_array[new_x-i][new_y-i] != players_turn) {
+								extra_turn_flag = 1;
+								game_board_array[new_x-i][new_y-i] = EMPTY;
+							} else {
+								break;
+							}
+						} else {
+							break;
+						}
+					}
+				}	
+			} else if (compass_direction == 5) { //SOUTH--DONE!!!
+				if (direction_to_take == 1) {//Forward take					
+					for(int i = new_y+1; i<rows; i++) {
+						if(i<0) break;
+						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn) {
+							extra_turn_flag = 1;
+							game_board_array[new_x][i] = EMPTY;
+						} else {
+							break;
+						}
+					}
+				} else {
+					for(int i = new_y-2; i >=0; i--) {
+						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn) {
+							extra_turn_flag = 1;
+							game_board_array[new_x][i] = EMPTY;
+						} else {
+							break;
+						}
+					}
+				}				
+			} else if (compass_direction == 6) { //SOUTHWEST
+				if (direction_to_take == 1) {
+					for(int i = 1; i<columns; i++) {
+						if(new_x-i >= 0 && new_y+i < rows) {
+							if(game_board_array[new_x-i][new_y+i] != EMPTY && game_board_array[new_x-i][new_y+i] != players_turn) {
+								extra_turn_flag = 1;
+								game_board_array[new_x-i][new_y+i] = EMPTY;
+							} else {
+								break;
+							}
+						} else {
+							break;
+						}
+					}
+				} else {
+					for(int i = 2; i<columns; i++) {
+						if(new_x+i < columns && new_y-i >= 0) {
+							if(game_board_array[new_x+i][new_y-i] != EMPTY && game_board_array[new_x+i][new_y-i] != players_turn) {
+								extra_turn_flag = 1;
+								game_board_array[new_x+i][new_y-i] = EMPTY;
+							} else {
+								break;
+							}
+						} else {
+							break;
+						}
+					}
+				}	
+			} else if (compass_direction == 7) { //WEST--DONE!!!
+				if (direction_to_take == 1) {//Forward take					
+					for(int i = new_x-1; i>=0; i--) {
+						if(i<0) break;
+						if(game_board_array[i][new_y] != EMPTY && game_board_array[i][new_y] != players_turn) {
+							extra_turn_flag = 1;
+							game_board_array[i][new_y] = EMPTY;
+						} else {
+							break;
+						}
+					}
+				} else {
+					for(int i = new_x+2; i <columns; i++) {
+						if(game_board_array[i][new_y] != EMPTY && game_board_array[i][new_y] != players_turn) {
+							extra_turn_flag = 1;
+							game_board_array[i][new_y] = EMPTY;
+						} else {
+							break;
+						}
+					}
+				}		
+			} else {//NORTHWEST
+				if (direction_to_take == 1) {
+					for(int i = 1; i<columns; i++) {
+						if(new_x-i >= 0 && new_y-i >= 0) {
+							if(game_board_array[new_x-i][new_y-i] != EMPTY && game_board_array[new_x-i][new_y-i] != players_turn) {
+								extra_turn_flag = 1;
+								game_board_array[new_x-i][new_y-i] = EMPTY;
+							} else {
+								break;
+							}
+						} else {
+							break;
+						}
+					}
+				} else { 
+					for(int i = 2; i<columns; i++) {
+						if(new_x+i < columns && new_y+i < rows) {
+							if(game_board_array[new_x+i][new_y+i] != EMPTY && game_board_array[new_x+i][new_y+i] != players_turn) {
+								extra_turn_flag = 1;
+								game_board_array[new_x+i][new_y+i] = EMPTY;
+							} else {
+								break;
+							}
+						} else {
+							break;
+						}
+					}
+				}	
+			}
+			
+		}
+	}
+	
+	public class Human_Player extends Player{
+		
+		public Human_Player(int player_number, int player_type) {
+			who_am_i = player_number;
+			what_am_i = player_type;
+		}
 
 		@Override
 		public void execute_move(int[] array_of_moves) {
@@ -283,211 +477,6 @@ public class Board extends JPanel{
 			}
 			
 			erase_pieces(new_x, new_y, compass_direction, direction_to_take);			
-		}
-
-		@Override
-		public void erase_pieces(int new_x, int new_y, int compass_direction, int direction_to_take) {
-			if (direction_to_take == 0) return;
-			
-			if (compass_direction == 1) { //NORTH --DONE!!!
-				if (direction_to_take == 1) {//Forward take					
-					for(int i = new_y-1; i>=0; i--) {
-						if(i<0) break;
-						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn) {
-							extra_turn_flag = 1;
-							game_board_array[new_x][i] = EMPTY;
-						} else {
-							break;
-						}
-					}
-				} else {
-					for(int i = new_y+2; i < 5; i++) {
-						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn) {
-							extra_turn_flag = 1;
-							game_board_array[new_x][i] = EMPTY;
-						} else {
-							break;
-						}
-					}
-				}
-			} else if (compass_direction == 2) { //NORTHEAST
-				if (direction_to_take == 1) {
-					for(int i = 1; i<9; i++) {
-						if(new_x+i < 9 && new_y-i > 0) {
-							if(game_board_array[new_x+i][new_y-i] != EMPTY && game_board_array[new_x+i][new_y-i] != players_turn) {
-								extra_turn_flag = 1;
-								game_board_array[new_x+i][new_y-i] = EMPTY;
-							} else {
-								break;
-							}
-						} else {
-							break;
-						}
-					}
-				} else {
-					for(int i = 2; i<9; i++) {
-						if(new_x-i >= 0 && new_y+i < 5) {
-							if(game_board_array[new_x-i][new_y+i] != EMPTY && game_board_array[new_x-i][new_y+i] != players_turn) {
-								extra_turn_flag = 1;
-								game_board_array[new_x-i][new_y+i] = EMPTY;
-							} else {
-								break;
-							}
-						} else {
-							break;
-						}
-					}
-				}
-				
-			} else if (compass_direction == 3) { //EAST--DONE!!!
-				if (direction_to_take == 1) {//Forward take					
-					for(int i = new_x+1; i<9; i++) {
-						if(i<0) break;
-						if(game_board_array[i][new_y] != EMPTY && game_board_array[i][new_y] != players_turn) {
-							extra_turn_flag = 1;
-							game_board_array[i][new_y] = EMPTY;
-						} else {
-							break;
-						}
-					}
-				} else {
-					for(int i = new_x-2; i >=0; i--) {
-						if(game_board_array[i][new_y] != EMPTY && game_board_array[i][new_y] != players_turn) {
-							extra_turn_flag = 1;
-							game_board_array[i][new_y] = EMPTY;
-						} else {
-							break;
-						}
-					}
-				}
-			} else if (compass_direction == 4) { //SOUTHEAST
-				if (direction_to_take == 1) {
-					for(int i = 1; i<9; i++) {
-						if(new_x+i < 9 && new_y+i < 5) {
-							if(game_board_array[new_x+i][new_y+i] != EMPTY && game_board_array[new_x+i][new_y+i] != players_turn) {
-								extra_turn_flag = 1;
-								game_board_array[new_x+i][new_y+i] = EMPTY;
-							} else {
-								break;
-							}
-						} else {
-							break;
-						}
-					}
-				} else {
-					for(int i = 2; i<9; i++) {
-						if(new_x-i >= 0 && new_y-i >= 0) {
-							if(game_board_array[new_x-i][new_y-i] != EMPTY && game_board_array[new_x-i][new_y-i] != players_turn) {
-								extra_turn_flag = 1;
-								game_board_array[new_x-i][new_y-i] = EMPTY;
-							} else {
-								break;
-							}
-						} else {
-							break;
-						}
-					}
-				}	
-			} else if (compass_direction == 5) { //SOUTH--DONE!!!
-				if (direction_to_take == 1) {//Forward take					
-					for(int i = new_y+1; i<5; i++) {
-						if(i<0) break;
-						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn) {
-							extra_turn_flag = 1;
-							game_board_array[new_x][i] = EMPTY;
-						} else {
-							break;
-						}
-					}
-				} else {
-					for(int i = new_y-2; i >=0; i--) {
-						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn) {
-							extra_turn_flag = 1;
-							game_board_array[new_x][i] = EMPTY;
-						} else {
-							break;
-						}
-					}
-				}				
-			} else if (compass_direction == 6) { //SOUTHWEST
-				if (direction_to_take == 1) {
-					for(int i = 1; i<9; i++) {
-						if(new_x-i >= 0 && new_y+i < 5) {
-							if(game_board_array[new_x-i][new_y+i] != EMPTY && game_board_array[new_x-i][new_y+i] != players_turn) {
-								extra_turn_flag = 1;
-								game_board_array[new_x-i][new_y+i] = EMPTY;
-							} else {
-								break;
-							}
-						} else {
-							break;
-						}
-					}
-				} else {
-					for(int i = 2; i<9; i++) {
-						if(new_x+i < 9 && new_y-i >= 0) {
-							if(game_board_array[new_x+i][new_y-i] != EMPTY && game_board_array[new_x+i][new_y-i] != players_turn) {
-								extra_turn_flag = 1;
-								game_board_array[new_x+i][new_y-i] = EMPTY;
-							} else {
-								break;
-							}
-						} else {
-							break;
-						}
-					}
-				}	
-			} else if (compass_direction == 7) { //WEST--DONE!!!
-				if (direction_to_take == 1) {//Forward take					
-					for(int i = new_x-1; i>=0; i--) {
-						if(i<0) break;
-						if(game_board_array[i][new_y] != EMPTY && game_board_array[i][new_y] != players_turn) {
-							extra_turn_flag = 1;
-							game_board_array[i][new_y] = EMPTY;
-						} else {
-							break;
-						}
-					}
-				} else {
-					for(int i = new_x+2; i <9; i++) {
-						if(game_board_array[i][new_y] != EMPTY && game_board_array[i][new_y] != players_turn) {
-							extra_turn_flag = 1;
-							game_board_array[i][new_y] = EMPTY;
-						} else {
-							break;
-						}
-					}
-				}		
-			} else {//NORTHWEST
-				if (direction_to_take == 1) {
-					for(int i = 1; i<9; i++) {
-						if(new_x-i >= 0 && new_y-i >= 0) {
-							if(game_board_array[new_x-i][new_y-i] != EMPTY && game_board_array[new_x-i][new_y-i] != players_turn) {
-								extra_turn_flag = 1;
-								game_board_array[new_x-i][new_y-i] = EMPTY;
-							} else {
-								break;
-							}
-						} else {
-							break;
-						}
-					}
-				} else { 
-					for(int i = 2; i<9; i++) {
-						if(new_x+i < 9 && new_y+i < 5) {
-							if(game_board_array[new_x+i][new_y+i] != EMPTY && game_board_array[new_x+i][new_y+i] != players_turn) {
-								extra_turn_flag = 1;
-								game_board_array[new_x+i][new_y+i] = EMPTY;
-							} else {
-								break;
-							}
-						} else {
-							break;
-						}
-					}
-				}	
-			}
-			
 		}		
 		
 	}
@@ -499,27 +488,74 @@ public class Board extends JPanel{
 			what_am_i = player_type;
 		}
 		
-		public int get_who_i_am() {return who_am_i;}
-		public int get_what_i_am() {return what_am_i;}
-
-		@Override
-		public int check_valid_move(int[] array_of_moves) {
-			// TODO Auto-generated method stub
-			return 0;
+		private int[] search_move(int my_num) { //Use the game_board_array and my_num to find out the best move for player my_num
+			int[] results_of_search = new int[5];
+			
+			//Code for move choice here. returns results_of_search[] where 0=old_x, 1=old_y, 2=new_x, 3=new_y, 4=direction to take
+			System.out.println("GOT INTO SEARCH_MOVE!!");
+			
+			return results_of_search;
 		}
-
+		
 		@Override
 		public void execute_move(int[] array_of_moves) {
-			// TODO Auto-generated method stub
+			int my_num = array_of_moves[0];
+			int[] results_of_search = new int[5];
+			
+			results_of_search = search_move(my_num);
+			
+			results_of_search[0] = 5;//to be commented
+			results_of_search[1] = 4;//to be commented
+			results_of_search[2] = 5;//to be commented
+			results_of_search[3] = 3;//to be commented
+			results_of_search[4] = 1;//to be commented
+			
+			int old_x = results_of_search[0];
+			int old_y = results_of_search[1];
+			int new_x = results_of_search[2];
+			int new_y = results_of_search[3];
+			int direction_to_take = results_of_search[4];
+			
+			game_board_array[old_x][old_y] = EMPTY;
+			game_board_array[new_x][new_y] = players_turn;
+			
+			int compass_direction; //corresponds to 1-8 for direction of move with 1=north, 2=northeast, 3=east...
+			if(old_x < new_x) { //East move		
+				if(old_y < new_y) { //South
+					System.out.println("SOUTHEAST move!!!!!!!!");
+					compass_direction = 4;
+				} else if (old_y > new_y){
+					System.out.println("NORTHEAST move!!!!!!!!");
+					compass_direction = 2;
+				} else {
+					System.out.println("EAST move!!!!!!!!");
+					compass_direction = 3;
+				}
+			} else if (old_x > new_x) { //West move
+				if(old_y < new_y) { //NORTH
+					System.out.println("SOUTHWEST move!!!!!!!!");
+					compass_direction = 6;
+				} else if (old_y > new_y){ //South
+					System.out.println("NORTHWEST move!!!!!!!!");
+					compass_direction = 8;
+				} else {
+					System.out.println("WEST move!!!!!!!!");
+					compass_direction = 7;
+				}
+			} else { //NORTH OR SOUTH
+				if(old_y < new_y) { //NORTH
+					System.out.println("SOUTH move!!!!!!!!");
+					compass_direction = 5;
+				} else {
+					System.out.println("NORTH move!!!!!!!!");
+					compass_direction = 1;
+				}
+			}
+			
+			erase_pieces(new_x, new_y, compass_direction, direction_to_take);	
 			
 		}
 
-		@Override
-		public void erase_pieces(int new_x, int new_y, int compass_direction,
-				int direction_to_take) {
-			// TODO Auto-generated method stub
-			
-		}
 	}	
 	
 	//-------------------------------GUI--------------------------------//
@@ -583,7 +619,9 @@ public class Board extends JPanel{
 			
 			// if its a CPU's turn we need to execute its move
 			if (players_turn == 1 && player_1.get_what_i_am() == 1 && click_counter == 0) {
-				player_1.execute_move(new int[4]);
+				int[] passing = new int[4];
+				passing[0] = players_turn;
+				player_1.execute_move(passing);
 				move_counter++;
 				players_turn = 2;
 				if (player_2.get_what_i_am() == 1) {
@@ -596,7 +634,9 @@ public class Board extends JPanel{
 				return;
 			}
 			if (players_turn == 2 && player_2.get_what_i_am() == 1 && click_counter == 0) {
-				player_2.execute_move(new int[4]);
+				int[] passing = new int[4];
+				passing[0] = players_turn;
+				player_2.execute_move(passing);
 				move_counter++;
 				players_turn = 1;
 				if (player_1.get_what_i_am() == 1) {
