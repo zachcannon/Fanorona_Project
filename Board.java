@@ -183,7 +183,7 @@ public class Board extends JPanel{
 				}
 				// check along diagonal
 				for (int i=old_x+1; i<=new_x; ++i) {
-					int j = new_y+(i-(old_x+1));
+					int j = old_y-(i-old_x);
 					if (game_board_array[i][j] != EMPTY) {
 						return 0;
 					}
@@ -196,7 +196,7 @@ public class Board extends JPanel{
 				}
 				// check diagonal
 				for (int i=new_x; i<old_x; ++i) {
-					int j = (old_y+1)+(i-new_x);
+					int j = new_y-(i-new_x);
 					if (game_board_array[i][j] != EMPTY) {
 						return 0;
 					}
@@ -247,7 +247,7 @@ public class Board extends JPanel{
 			} else if (compass_direction == 2) { //NORTHEAST
 				if (direction_to_take == 1) {
 					for(int i = 1; i<columns; i++) {
-						if(new_x+i < columns && new_y-i > 0) {
+						if(new_x+i < columns && new_y-i >= 0) {
 							if(game_board_array[new_x+i][new_y-i] != EMPTY && game_board_array[new_x+i][new_y-i] != players_turn) {
 								extra_turn_flag = 1;
 								game_board_array[new_x+i][new_y-i] = EMPTY;
