@@ -6,19 +6,19 @@ public class GameRun {
 		temp = 0;
 	}
 
-	public void run_game(int choice, int cols, int rows) {
+	public void run_game(int choice, int cols, int rows, long time_limit) {
 		System.out.println("Game started\n");
 		Board game_board;
 		
 		if(choice == 0) { //Human vs Human
 			System.out.println("Human vs Human Selected\n");
-			game_board = new Board(0, cols, rows);
+			game_board = new Board(0, cols, rows, time_limit);
 		} else if (choice == 1) {		
 			System.out.println("Human vs Computer Selected\n");
-			game_board = new Board(1, cols, rows);
+			game_board = new Board(1, cols, rows, time_limit);
 		} else if (choice == 2) {
 			System.out.println("Computer vs Computer Selected\n");
-			game_board = new Board(2, cols, rows);
+			game_board = new Board(2, cols, rows, time_limit);
 		}		
 	}
 }

@@ -19,11 +19,15 @@ public class GameSelect extends JFrame {
 	private JPanel contentPane;
 	private JTextField txtColumns;
 	private JTextField txtRows;
+	private JTextField txtTimeLimitms;
 	
 	int cols_;
 	int rows_;
 	String cols;
 	String rows;
+	
+	String time_limit;
+	long time_limit_;
 
 	/**
 	 * Launch the application.
@@ -97,7 +101,16 @@ public class GameSelect extends JFrame {
 				if (rows_ == 2 || rows_ == 4 || rows_ == 6 || rows_ == 8 || rows_ == 10 ||rows_ == 12 ) {
 					rows_ = rows_+1;
 				}
-				thegame.run_game(0, cols_, rows_);				
+				
+				time_limit = txtTimeLimitms.getText();
+				if (time_limit.equals("Time Limit (ms)") || time_limit.equals("")) {
+					// default to ten minutes
+					time_limit_ = 600000;
+				}
+				else {
+					time_limit_ = Long.parseLong(time_limit);
+				}
+				thegame.run_game(0, cols_, rows_, time_limit_);				
 				dispose();
 			}
 		});
@@ -135,7 +148,16 @@ public class GameSelect extends JFrame {
 				if (rows_ == 2 || rows_ == 4 || rows_ == 6 || rows_ == 8 || rows_ == 10 ||rows_ == 12 ) {
 					rows_ = rows_+1;
 				}
-				thegame.run_game(1, cols_, rows_);				
+				
+				time_limit = txtTimeLimitms.getText();
+				if (time_limit.equals("Time Limit (ms)") || time_limit.equals("")) {
+					// default to ten minutes
+					time_limit_ = 600000;
+				}
+				else {
+					time_limit_ = Long.parseLong(time_limit);
+				}
+				thegame.run_game(1, cols_, rows_, time_limit_);				
 				dispose();
 			}
 		});
@@ -173,7 +195,16 @@ public class GameSelect extends JFrame {
 				if (rows_ == 2 || rows_ == 4 || rows_ == 6 || rows_ == 8 || rows_ == 10 ||rows_ == 12 ) {
 					rows_ = rows_+1;
 				}
-				thegame.run_game(2, cols_, rows_);				
+				
+				time_limit = txtTimeLimitms.getText();
+				if (time_limit.equals("Time Limit (ms)") || time_limit.equals("")) {
+					// default to ten minutes
+					time_limit_ = 600000;
+				}
+				else {
+					time_limit_ = Long.parseLong(time_limit);
+				}
+				thegame.run_game(2, cols_, rows_, time_limit_);				
 				dispose();
 			}
 		});
@@ -181,15 +212,24 @@ public class GameSelect extends JFrame {
 		contentPane.add(btnCpuVsCpu);
 		
 		txtColumns = new JTextField();
+		txtColumns.setFont(new Font("Tahoma", Font.PLAIN, 9));
 		txtColumns.setText("Columns");
 		txtColumns.setBounds(10, 40, 86, 20);
 		contentPane.add(txtColumns);
 		txtColumns.setColumns(10);
 		
 		txtRows = new JTextField();
+		txtRows.setFont(new Font("Tahoma", Font.PLAIN, 9));
 		txtRows.setText("Rows");
-		txtRows.setBounds(199, 40, 86, 20);
+		txtRows.setBounds(103, 40, 86, 20);
 		contentPane.add(txtRows);
 		txtRows.setColumns(10);
+		
+		txtTimeLimitms = new JTextField();
+		txtTimeLimitms.setFont(new Font("Tahoma", Font.PLAIN, 9));
+		txtTimeLimitms.setText("Time Limit (ms)");
+		txtTimeLimitms.setBounds(199, 40, 86, 20);
+		contentPane.add(txtTimeLimitms);
+		txtTimeLimitms.setColumns(10);
 	}
 }

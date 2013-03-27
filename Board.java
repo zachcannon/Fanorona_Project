@@ -15,7 +15,8 @@ public class Board extends JPanel{
 	static final int
 	EMPTY = 0,
 	BLACK = 1,	//PLAYER 1 is black
-	RED = 2;	//PLAYER 2 is red
+	RED = 2,	//PLAYER 2 is red
+	SACRIFICED = 3;
 
 	JFrame window;
 	String game_message;
@@ -32,12 +33,14 @@ public class Board extends JPanel{
 	int extra_turn_flag;
 	
 	long starting_time;
+	long turn_time_limit;
 	
 	
 	//----------------------------MAIN_GAME----------------------------//	
-	public Board(int number_type, int cols, int rows_) { //Constructor
+	public Board(int number_type, int cols, int rows_, long time_limit) { //Constructor
 		columns = cols;
 		rows = rows_;
+		turn_time_limit = time_limit;
 		
 		game_board_array = new int[columns][rows]; //[x][y] so [0-8][0-4] possible choices
 		
@@ -227,7 +230,8 @@ public class Board extends JPanel{
 				if (direction_to_take == 1) {//Forward take					
 					for(int i = new_y-1; i>=0; i--) {
 						if(i<0) break;
-						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn) {
+						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn
+								&& game_board_array[new_x][i] != SACRIFICED) {
 							extra_turn_flag = 1;
 							game_board_array[new_x][i] = EMPTY;
 						} else {
@@ -236,7 +240,8 @@ public class Board extends JPanel{
 					}
 				} else {
 					for(int i = new_y+2; i < rows; i++) {
-						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn) {
+						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn
+								&& game_board_array[new_x][i] != SACRIFICED) {
 							extra_turn_flag = 1;
 							game_board_array[new_x][i] = EMPTY;
 						} else {
@@ -248,7 +253,8 @@ public class Board extends JPanel{
 				if (direction_to_take == 1) {
 					for(int i = 1; i<columns; i++) {
 						if(new_x+i < columns && new_y-i >= 0) {
-							if(game_board_array[new_x+i][new_y-i] != EMPTY && game_board_array[new_x+i][new_y-i] != players_turn) {
+							if(game_board_array[new_x+i][new_y-i] != EMPTY && game_board_array[new_x+i][new_y-i] != players_turn
+									&& game_board_array[new_x+i][new_y-i] != SACRIFICED) {
 								extra_turn_flag = 1;
 								game_board_array[new_x+i][new_y-i] = EMPTY;
 							} else {
@@ -261,7 +267,8 @@ public class Board extends JPanel{
 				} else {
 					for(int i = 2; i<columns; i++) {
 						if(new_x-i >= 0 && new_y+i < rows) {
-							if(game_board_array[new_x-i][new_y+i] != EMPTY && game_board_array[new_x-i][new_y+i] != players_turn) {
+							if(game_board_array[new_x-i][new_y+i] != EMPTY && game_board_array[new_x-i][new_y+i] != players_turn
+									&& game_board_array[new_x-i][new_y+i] != SACRIFICED) {
 								extra_turn_flag = 1;
 								game_board_array[new_x-i][new_y+i] = EMPTY;
 							} else {
@@ -277,7 +284,8 @@ public class Board extends JPanel{
 				if (direction_to_take == 1) {//Forward take					
 					for(int i = new_x+1; i<columns; i++) {
 						if(i<0) break;
-						if(game_board_array[i][new_y] != EMPTY && game_board_array[i][new_y] != players_turn) {
+						if(game_board_array[i][new_y] != EMPTY && game_board_array[i][new_y] != players_turn
+								&& game_board_array[i][new_y] != SACRIFICED) {
 							extra_turn_flag = 1;
 							game_board_array[i][new_y] = EMPTY;
 						} else {
@@ -286,7 +294,8 @@ public class Board extends JPanel{
 					}
 				} else {
 					for(int i = new_x-2; i >=0; i--) {
-						if(game_board_array[i][new_y] != EMPTY && game_board_array[i][new_y] != players_turn) {
+						if(game_board_array[i][new_y] != EMPTY && game_board_array[i][new_y] != players_turn
+								&& game_board_array[i][new_y] != SACRIFICED) {
 							extra_turn_flag = 1;
 							game_board_array[i][new_y] = EMPTY;
 						} else {
@@ -298,7 +307,8 @@ public class Board extends JPanel{
 				if (direction_to_take == 1) {
 					for(int i = 1; i<columns; i++) {
 						if(new_x+i < columns && new_y+i < rows) {
-							if(game_board_array[new_x+i][new_y+i] != EMPTY && game_board_array[new_x+i][new_y+i] != players_turn) {
+							if(game_board_array[new_x+i][new_y+i] != EMPTY && game_board_array[new_x+i][new_y+i] != players_turn
+									&& game_board_array[new_x+i][new_y+i] != SACRIFICED) {
 								extra_turn_flag = 1;
 								game_board_array[new_x+i][new_y+i] = EMPTY;
 							} else {
@@ -311,7 +321,8 @@ public class Board extends JPanel{
 				} else {
 					for(int i = 2; i<columns; i++) {
 						if(new_x-i >= 0 && new_y-i >= 0) {
-							if(game_board_array[new_x-i][new_y-i] != EMPTY && game_board_array[new_x-i][new_y-i] != players_turn) {
+							if(game_board_array[new_x-i][new_y-i] != EMPTY && game_board_array[new_x-i][new_y-i] != players_turn
+									&& game_board_array[new_x-i][new_y-i] != SACRIFICED) {
 								extra_turn_flag = 1;
 								game_board_array[new_x-i][new_y-i] = EMPTY;
 							} else {
@@ -326,7 +337,8 @@ public class Board extends JPanel{
 				if (direction_to_take == 1) {//Forward take					
 					for(int i = new_y+1; i<rows; i++) {
 						if(i<0) break;
-						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn) {
+						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn
+								&& game_board_array[new_x][i] != SACRIFICED) {
 							extra_turn_flag = 1;
 							game_board_array[new_x][i] = EMPTY;
 						} else {
@@ -335,7 +347,8 @@ public class Board extends JPanel{
 					}
 				} else {
 					for(int i = new_y-2; i >=0; i--) {
-						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn) {
+						if(game_board_array[new_x][i] != EMPTY && game_board_array[new_x][i] != players_turn
+								&& game_board_array[new_x][i] != SACRIFICED) {
 							extra_turn_flag = 1;
 							game_board_array[new_x][i] = EMPTY;
 						} else {
@@ -347,7 +360,8 @@ public class Board extends JPanel{
 				if (direction_to_take == 1) {
 					for(int i = 1; i<columns; i++) {
 						if(new_x-i >= 0 && new_y+i < rows) {
-							if(game_board_array[new_x-i][new_y+i] != EMPTY && game_board_array[new_x-i][new_y+i] != players_turn) {
+							if(game_board_array[new_x-i][new_y+i] != EMPTY && game_board_array[new_x-i][new_y+i] != players_turn
+									&& game_board_array[new_x-i][new_y+i] != SACRIFICED) {
 								extra_turn_flag = 1;
 								game_board_array[new_x-i][new_y+i] = EMPTY;
 							} else {
@@ -360,7 +374,8 @@ public class Board extends JPanel{
 				} else {
 					for(int i = 2; i<columns; i++) {
 						if(new_x+i < columns && new_y-i >= 0) {
-							if(game_board_array[new_x+i][new_y-i] != EMPTY && game_board_array[new_x+i][new_y-i] != players_turn) {
+							if(game_board_array[new_x+i][new_y-i] != EMPTY && game_board_array[new_x+i][new_y-i] != players_turn
+									&& game_board_array[new_x+i][new_y-i] != SACRIFICED) {
 								extra_turn_flag = 1;
 								game_board_array[new_x+i][new_y-i] = EMPTY;
 							} else {
@@ -375,7 +390,8 @@ public class Board extends JPanel{
 				if (direction_to_take == 1) {//Forward take					
 					for(int i = new_x-1; i>=0; i--) {
 						if(i<0) break;
-						if(game_board_array[i][new_y] != EMPTY && game_board_array[i][new_y] != players_turn) {
+						if(game_board_array[i][new_y] != EMPTY && game_board_array[i][new_y] != players_turn
+								&& game_board_array[i][new_y] != SACRIFICED) {
 							extra_turn_flag = 1;
 							game_board_array[i][new_y] = EMPTY;
 						} else {
@@ -384,7 +400,8 @@ public class Board extends JPanel{
 					}
 				} else {
 					for(int i = new_x+2; i <columns; i++) {
-						if(game_board_array[i][new_y] != EMPTY && game_board_array[i][new_y] != players_turn) {
+						if(game_board_array[i][new_y] != EMPTY && game_board_array[i][new_y] != players_turn
+								&& game_board_array[i][new_y] != SACRIFICED) {
 							extra_turn_flag = 1;
 							game_board_array[i][new_y] = EMPTY;
 						} else {
@@ -396,7 +413,8 @@ public class Board extends JPanel{
 				if (direction_to_take == 1) {
 					for(int i = 1; i<columns; i++) {
 						if(new_x-i >= 0 && new_y-i >= 0) {
-							if(game_board_array[new_x-i][new_y-i] != EMPTY && game_board_array[new_x-i][new_y-i] != players_turn) {
+							if(game_board_array[new_x-i][new_y-i] != EMPTY && game_board_array[new_x-i][new_y-i] != players_turn
+									&& game_board_array[new_x-i][new_y-i] != SACRIFICED) {
 								extra_turn_flag = 1;
 								game_board_array[new_x-i][new_y-i] = EMPTY;
 							} else {
@@ -409,7 +427,8 @@ public class Board extends JPanel{
 				} else { 
 					for(int i = 2; i<columns; i++) {
 						if(new_x+i < columns && new_y+i < rows) {
-							if(game_board_array[new_x+i][new_y+i] != EMPTY && game_board_array[new_x+i][new_y+i] != players_turn) {
+							if(game_board_array[new_x+i][new_y+i] != EMPTY && game_board_array[new_x+i][new_y+i] != players_turn
+									&& game_board_array[new_x+i][new_y+i] != SACRIFICED) {
 								extra_turn_flag = 1;
 								game_board_array[new_x+i][new_y+i] = EMPTY;
 							} else {
@@ -571,8 +590,18 @@ public class Board extends JPanel{
 		int seconds;
 		boolean is_game_over;
 		
+		long begining_of_move;
+		
 		// 0=old_x, 1=old_y, 2=new_x, 3=new_y, 4=forward or backwards(2=back, 1=forward, 0 if no take)
 		int[] move;
+		
+		// 0=flag (1 yes this player has a sacrificed piece on  the board, 0 otherwise)
+		// 1=what the move counter will need to be in order to remove the piece
+		// 2=x-cord on the board where the piece is
+		// 3=y-cord on the board where the piece is
+		int[] player_1_sac_move;
+		int[] player_2_sac_move;
+		
 		public BoardGraphics() {
 			if (player_1.get_what_i_am() == 1) {
 				game_message = "Welcome to Fanorona! CPU Player One's turn, click anywhere to execute it's move";
@@ -583,9 +612,14 @@ public class Board extends JPanel{
 			click_counter = 0;
 			move_counter = 0;
 			move = new int[5];
+			player_1_sac_move = new int[4];
+			player_2_sac_move = new int[4];
+			player_1_sac_move[0] = 0;
+			player_2_sac_move[0] = 0;
 			setSize(height,width);
 			setBackground(Color.white);
 			is_game_over = false;
+			begining_of_move = new Date().getTime();
 		}	
 		
 		
@@ -628,8 +662,9 @@ public class Board extends JPanel{
 					game_message = "CPU Player Two's turn, click anywhere to execute it's move";
 				}
 				else {
-					game_message = "Player 1 (Black) please select a piece to move";
+					game_message = "Player 2 (Red) please select a piece to move";
 				}
+				begining_of_move = new Date().getTime();
 				repaint();
 				return;
 			}
@@ -645,6 +680,7 @@ public class Board extends JPanel{
 				else {
 					game_message = "Player 1 (Black) please select a piece to move";
 				}
+				begining_of_move = new Date().getTime();
 				repaint();
 				return;
 			}
@@ -677,12 +713,69 @@ public class Board extends JPanel{
 				}
 				click_counter = 0;
 				move_counter++;
+				begining_of_move = new Date().getTime();
 				repaint();
 				return;
 			}
+			
+			// if the sacrifice button is pressed we want to sacrifice the selected piece
+			// button bounds: x_offset+columns*piece_diameter*2, (rows*piece_diameter+piece_diameter*2), 75, 25
+			if (click_counter ==  1 && extra_turn_flag == 0
+					&& x > x_offset+columns*piece_diameter*2 && x < x_offset+columns*piece_diameter*2+75
+					&& y > rows*piece_diameter && y < rows*piece_diameter+25) {
+				game_board_array[move[0]][move[1]] = SACRIFICED;
+				if (players_turn == 1) {
+					player_1_sac_move[0] = 1;
+					player_1_sac_move[1] = move_counter+2;
+					player_1_sac_move[2] = move[0];
+					player_1_sac_move[3] = move[1];
+					players_turn = 2;
+					extra_turn_flag = 0;
+					if (player_2.get_what_i_am() == 1) {
+						game_message = "CPU Player Two's turn, click anywhere to execute it's move";
+					}
+					else {
+						game_message = "Player 2 (Red) select a piece to move";
+					}
+				}
+				else {
+					player_2_sac_move[0] = 1;
+					player_2_sac_move[1] = move_counter+2;
+					player_2_sac_move[2] = move[0];
+					player_2_sac_move[3] = move[1];
+					players_turn = 1;
+					extra_turn_flag = 0;
+					if (player_2.get_what_i_am() == 1) {
+						game_message = "CPU Player One's turn, click anywhere to execute it's move";
+					}
+					else {
+						game_message = "Player 1 (Black) select a piece to move";
+					}
+				}
+				click_counter = 0;
+				move_counter++;
+				begining_of_move = new Date().getTime();
+				repaint();
+				return;
+				
+			}
+			
 			// if this is a direction selection click we only want to
 			// take a click inside the "buttons"
 			if (click_counter == 2) {
+				// first lets make sure they haven't gone over the time limit
+				if ((new Date().getTime() - begining_of_move ) > turn_time_limit) {
+					if (players_turn == 1) {
+						game_message = "Player One's turn took too much time! Player 2 Wins!";
+					}
+					else {
+						game_message = "Player Two's turn took too much time! Player 1 Wins!";
+					}
+					is_game_over = true;
+					repaint();
+					return;
+				}
+				
 				/* bounds for buttons:
 				g.drawRect(x_offset+columns*piece_diameter*2, y_offset, 75, 25);
 	        	g.drawRect(x_offset+columns*piece_diameter*2, y_offset+piece_diameter*2, 75, 25);
@@ -728,14 +821,23 @@ public class Board extends JPanel{
 							else {
 								game_message = "Player 2 (Red) select a piece to move";
 							}
+							begining_of_move = new Date().getTime();
 							move_counter++;
 						}
 						repaint();
-						
 						return;
 					}
 					else {
-						game_message = "That is not a valid move! Player 1 (black) select a peice to move";
+						if (extra_turn_flag == 1) {
+							// the player took some pieces they get to go again
+							game_message = "Invalid move! Player 1 (Black) select where to move ("+move[2]+","+move[3]+") or pass";
+							move[0] = move[2];
+							move[1] = move[3];
+							click_counter = 1;
+						}
+						else {
+							game_message = "That is not a valid move! Player 1 (Black) select a peice to move";
+						}
 						repaint();
 						return;
 					}
@@ -754,14 +856,23 @@ public class Board extends JPanel{
 						else {
 							players_turn = 1;
 							game_message = "Player 1 (Black) select a piece to move";
+							begining_of_move = new Date().getTime();
 							move_counter++;
 						}
 						repaint();
-						
 						return;
 					}
 					else {
-						game_message = "That is not a valid move! Player 2 (red) select a peice to move";
+						if (extra_turn_flag == 1) {
+							// the player took some pieces they get to go again
+							game_message = "Invalid move! Player 2 (Red) select where to move ("+move[2]+","+move[3]+") or pass";
+							move[0] = move[2];
+							move[1] = move[3];
+							click_counter = 1;
+						}
+						else {
+							game_message = "That is not a valid move! Player 2 (red) select a peice to move";
+						}
 						repaint();
 						return;
 					}
@@ -852,6 +963,18 @@ public class Board extends JPanel{
 		}// end of processClick
 		
 		public void paintComponent(Graphics g) {//Display board
+			// this has nothing to do with graphics but it
+			// seemed like a good place to check whether or not
+			// we need to remove a sacrificed piece from the board
+			if (player_1_sac_move[0] == 1 && player_1_sac_move[1] == move_counter) {
+				game_board_array[player_1_sac_move[2]][player_1_sac_move[3]] = EMPTY;
+				player_1_sac_move[0] = 0;
+			}
+			if (player_2_sac_move[0] == 1 && player_2_sac_move[1] == move_counter) {
+				game_board_array[player_2_sac_move[2]][player_2_sac_move[3]] = EMPTY;
+				player_2_sac_move[0] = 0;
+			}
+			
 			// 'erase' previous message, and put in new message
 			g.setColor(Color.white);
 			g.fillRect(0, 0, width, height);
@@ -931,6 +1054,9 @@ public class Board extends JPanel{
 	        			g.fillOval(x_offset+piece_diameter*2*j, y_offset+piece_diameter*2*i, piece_diameter, piece_diameter);
 	        		} else if(game_board_array[j][i] == EMPTY) {
 	        			// draw nothing
+	        		} else if(game_board_array[j][i] == SACRIFICED) {
+	        			g.setColor(Color.gray);
+	        			g.fillOval(x_offset+piece_diameter*2*j, y_offset+piece_diameter*2*i, piece_diameter, piece_diameter);
 	        		}
 	        	}	        		        
 	        }
@@ -940,6 +1066,12 @@ public class Board extends JPanel{
 	        	g.setColor(Color.black);
 	        	g.drawRect(x_offset+columns*piece_diameter*2, (rows*piece_diameter), 75, 25);
 	        	g.drawString("Pass", x_offset+columns*piece_diameter*2+7, rows*piece_diameter+17);
+	        }
+	        // draw sacrifice button
+	        if (click_counter == 1 && extra_turn_flag == 0) {
+	        	g.setColor(Color.black);
+	        	g.drawRect(x_offset+columns*piece_diameter*2, (rows*piece_diameter), 75, 25);
+	        	g.drawString("Sacrifice", x_offset+columns*piece_diameter*2+7, rows*piece_diameter+17);
 	        }
 	        // draw take options
 	        if (click_counter == 2) {
