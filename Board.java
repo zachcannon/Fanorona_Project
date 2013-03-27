@@ -19,7 +19,7 @@ public class Board extends JPanel{
 
 	JFrame window;
 	String game_message;
-	BoardGraphics graphics = new BoardGraphics();
+	BoardGraphics graphics;
 	
 	int game_number_type;
 	Player player_1;
@@ -54,7 +54,7 @@ public class Board extends JPanel{
 			player_1 = new Computer_Player(1,1); //Player 1, human black
 			player_2 = new Computer_Player(2,1); //Player 2, human red
 		}
-		
+		graphics = new BoardGraphics();
 		setup_board();
 		create_window();
 		extra_turn_flag = 0;
@@ -524,34 +524,59 @@ public class Board extends JPanel{
 	
 	//-------------------------------GUI--------------------------------//
 	class BoardGraphics extends JPanel implements ActionListener, MouseListener {
-		int width = 900;
-		int height = 600;
+		int width = 950;
+		int height = 850;
+		int piece_diameter = 30;
+		int x_offset = piece_diameter;
+		int y_offset = piece_diameter;
 		int click_counter;
+		int move_counter;
+		int minutes;
+		int seconds;
+		boolean is_game_over;
 		
 		// 0=old_x, 1=old_y, 2=new_x, 3=new_y, 4=forward or backwards(2=back, 1=forward, 0 if no take)
 		int[] move;
 		public BoardGraphics() {
-			game_message = "Welcome to Fanorona! Player 1 (Black) will go first, please select a piece to move";
+			if (player_1.get_what_i_am() == 1) {
+				game_message = "Welcome to Fanorona! CPU Player One's turn, click anywhere to execute it's move";
+			}
+			else {
+				game_message = "Welcome to Fanorona! Player 1 (Black) will go first, please select a piece to move";
+			}
 			click_counter = 0;
+			move_counter = 0;
 			move = new int[5];
 			setSize(height,width);
 			setBackground(Color.white);
+			is_game_over = false;
 		}	
 		
 		
 		public void processClick(int x, int y) {
 			
+			if (is_game_over) {
+				return;
+			}
+			// check move count, if we are over then the game is a draw
+			if (move_counter > (10*rows)) {
+				is_game_over = true;
+				game_message = "Reached max number of moves, the game is a draw!";
+				repaint();
+				return;
+			}
 			// if the game is over we only want to display the message
 			// and then exit the function
 			if (check_end_of_game() != 0) {
 				if (check_end_of_game() == 1) {
 					// player 1 has won the game yay
-					game_message = "Player 1 is the winner!";
+					game_message = "Player 1 is the winner! This game lasted "+minutes+" minutes and "+seconds+" seconds";
 				}
 				else {
 					//player 2 won yay
-					game_message = "Player 2 has won the game!";
+					game_message = "Player 2 has won the game! This game lasted "+minutes+" minutes and "+seconds+" seconds";
 				}
+				is_game_over = true;
 				repaint();
 				return;
 			}
@@ -559,6 +584,7 @@ public class Board extends JPanel{
 			// if its a CPU's turn we need to execute its move
 			if (players_turn == 1 && player_1.get_what_i_am() == 1 && click_counter == 0) {
 				player_1.execute_move(new int[4]);
+				move_counter++;
 				players_turn = 2;
 				if (player_2.get_what_i_am() == 1) {
 					game_message = "CPU Player Two's turn, click anywhere to execute it's move";
@@ -571,6 +597,7 @@ public class Board extends JPanel{
 			}
 			if (players_turn == 2 && player_2.get_what_i_am() == 1 && click_counter == 0) {
 				player_2.execute_move(new int[4]);
+				move_counter++;
 				players_turn = 1;
 				if (player_1.get_what_i_am() == 1) {
 					game_message = "CPU Player One's turn, click anywhere to execute it's move";
@@ -584,7 +611,10 @@ public class Board extends JPanel{
 			
 			
 			// if they click the pass button change players
-			if (click_counter == 1 && extra_turn_flag == 1 && x > 425 && x < 525 && y > 500 && y < 525) {
+			// bounds off pass button: (x_offset+columns*piece_diameter*2, (rows*piece_diameter), 75, 25)
+			if (click_counter == 1 && extra_turn_flag == 1 &&
+				x > x_offset+columns*piece_diameter*2 && x < x_offset+columns*piece_diameter*2+75
+				&& y > rows*piece_diameter && y < rows*piece_diameter+25) {
 				if (players_turn == 1) {
 					players_turn = 2;
 					extra_turn_flag = 0;
@@ -606,6 +636,7 @@ public class Board extends JPanel{
 					}
 				}
 				click_counter = 0;
+				move_counter++;
 				repaint();
 				return;
 			}
@@ -613,20 +644,23 @@ public class Board extends JPanel{
 			// take a click inside the "buttons"
 			if (click_counter == 2) {
 				/* bounds for buttons:
-				g.drawRect(425, 500, 100, 25);
-	        	g.drawRect(550, 500, 100, 25);
-	        	g.drawRect(675, 500, 100, 25);
+				g.drawRect(x_offset+columns*piece_diameter*2, y_offset, 75, 25);
+	        	g.drawRect(x_offset+columns*piece_diameter*2, y_offset+piece_diameter*2, 75, 25);
+	        	g.drawRect(x_offset+columns*piece_diameter*2, y_offset+piece_diameter*4, 75, 25);
 	        	*/
 				extra_turn_flag = 0;
-				if (x > 425 && x < 525 && y > 500 && y < 525) {
+				if (x > x_offset+columns*piece_diameter*2 && x < x_offset+columns*piece_diameter*2+75
+					&& y > y_offset && y < y_offset+25) { //forward
 					move[4] = 1;
 					click_counter = 0;
 				}
-				else if (x > 550 && x < 650 && y > 500 && y < 525) {
+				else if (x > x_offset+columns*piece_diameter*2 && x < x_offset+columns*piece_diameter*2+75
+						&& y > y_offset+piece_diameter*2 && y < y_offset+piece_diameter*2+25) { // backwards
 					move[4] = 2;
 					click_counter = 0;
 				}
-				else if (x > 675 && x < 775 && y > 500 && y < 525) {
+				else if (x > x_offset+columns*piece_diameter*2 && x < x_offset+columns*piece_diameter*2+75
+						&& y > y_offset+piece_diameter*4 && y < y_offset+piece_diameter*4+25) { // no take
 					move[4] = 0;
 					click_counter = 0;
 				}
@@ -654,6 +688,7 @@ public class Board extends JPanel{
 							else {
 								game_message = "Player 2 (Red) select a piece to move";
 							}
+							move_counter++;
 						}
 						repaint();
 						
@@ -679,6 +714,7 @@ public class Board extends JPanel{
 						else {
 							players_turn = 1;
 							game_message = "Player 1 (Black) select a piece to move";
+							move_counter++;
 						}
 						repaint();
 						
@@ -694,16 +730,17 @@ public class Board extends JPanel{
 			
 			// otherwise we find was point was clicked on the board
 			System.out.println("X: "+x+" Y: "+y);
-			if (x<70 || x>790 || y <55 || y>455) {
+			if (x<(piece_diameter/2) || x>(piece_diameter*2*columns+piece_diameter/2)
+				|| y<(piece_diameter/2) || y>(piece_diameter*2*rows+piece_diameter/2)) {
 				System.out.println("invalid!");
 				game_message = "not valid! try again";
 				repaint();
 				return;
 			}
-			int x_no_offset = x-70;
-			int row = (int)(x_no_offset / 80);
-			int y_no_offset = y-55;
-			int col = (int)(y_no_offset / 80);
+			int x_with_error = x-(piece_diameter/2);
+			int row = (int)(x_with_error / (piece_diameter*2));
+			int y_with_error = y-(piece_diameter/2);
+			int col = (int)(y_with_error / (piece_diameter*2));
 			System.out.println("Row: "+row+" Col: "+col);
 			
 			// now we need to figure out where in the game we are at
@@ -780,33 +817,46 @@ public class Board extends JPanel{
 			g.fillRect(0, 0, width, height);
 			g.setColor(Color.black);
 			g.setFont(new  Font("Serif", Font.BOLD, 14));
-			g.drawString(game_message, 40, 490);
+			g.drawString(game_message, x_offset, 20+rows*piece_diameter*2);
 			
 			// calculate time elapsed and print it
-			int total_seconds =  (int) (((new Date()).getTime()-starting_time)/1000);
-			int minutes = total_seconds/60;
-			int seconds = total_seconds-minutes*60;
-			g.drawString(minutes+":"+seconds, 800, 20);
+			int total_seconds = (int) (((new Date()).getTime()-starting_time)/1000);
+			minutes = total_seconds/60;
+			seconds = total_seconds-minutes*60;
+			g.drawString(minutes+":"+seconds, columns*piece_diameter*2, 20);
+			
+			// print number of moves
+			g.drawString("Move Count: "+move_counter, x_offset, 20);
 			
 			// draw the vertical lines
 	        g.setColor(Color.black);
 	        for (int i=0; i<columns; ++i) {
-	        	g.drawLine(110+80*i, 95, 110+80*i, 415);
+	        	g.drawLine(x_offset+piece_diameter/2+piece_diameter*2*i, y_offset+piece_diameter/2,
+	        			x_offset+piece_diameter/2+piece_diameter*2*i,
+	        			y_offset-piece_diameter-piece_diameter/2+piece_diameter*2*rows);
 	        }
 	        // draw horizontal lines
 	        for (int i=0; i<rows; ++i) {
-	        	g.drawLine(110, 95+80*i, 750, 95+80*i);
+	        	g.drawLine(x_offset+piece_diameter/2, y_offset+piece_diameter/2+piece_diameter*2*i,
+	        			x_offset-piece_diameter-piece_diameter/2+piece_diameter*2*columns,
+	        			y_offset+piece_diameter/2+piece_diameter*2*i);
 	        }
 			// draw slanted (top left to bottom right) lines
 	        for (int i=0; i<(rows-1); ++i) {
 	        	if (i%2 == 0) {
 	        		for (int j=0; j<(columns/2); ++j) {
-	        			g.drawLine(110+160*j, 95+80*i, 190+160*j, 175+80*i);
+	        			g.drawLine(x_offset+(piece_diameter/2)+piece_diameter*4*j,
+	        					y_offset+(piece_diameter/2)+piece_diameter*2*i,
+	        					x_offset+(piece_diameter/2)+piece_diameter*2+piece_diameter*4*j,
+	        					y_offset+(piece_diameter/2)+piece_diameter*2+piece_diameter*2*i);
 	        		}
 	        	}
 	        	else {
 	        		for (int j = 0; j<(columns/2); ++j) {
-	        			g.drawLine(190+160*j, 95+80*i, 270+160*j, 175+80*i);
+	        			g.drawLine(x_offset+(piece_diameter/2)+piece_diameter*2+piece_diameter*4*j,
+	        					y_offset+(piece_diameter/2)+piece_diameter*2*i,
+	        					x_offset+(piece_diameter/2)+piece_diameter*4+piece_diameter*4*j,
+	        					y_offset+(piece_diameter/2)+piece_diameter*2+piece_diameter*2*i);
 	        		}
 	        	}
 	        }
@@ -814,12 +864,18 @@ public class Board extends JPanel{
 	        for (int i=0; i<(rows-1); ++i) {
 	        	if (i%2 == 0) {
 	        		for (int j=0; j<(columns/2); ++j) {
-	        			g.drawLine(190+160*j, 175+80*i, 270+160*j, 95+80*i);
+	        			g.drawLine(x_offset+(piece_diameter/2)+piece_diameter*2+piece_diameter*4*j,
+	        					y_offset+(piece_diameter/2)+piece_diameter*2+piece_diameter*2*i,
+	        					x_offset+(piece_diameter/2)+piece_diameter*4+piece_diameter*4*j,
+	        					y_offset+(piece_diameter/2)+piece_diameter*2*i);
 	        		}
 	        	}
 	        	else {
 	        		for (int j = 0; j<(columns/2); ++j) {
-	        			g.drawLine(110+160*j, 175+80*i, 190+160*j, 95+80*i);
+	        			g.drawLine(x_offset+(piece_diameter/2)+piece_diameter*4*j,
+	        					y_offset+(piece_diameter/2)+piece_diameter*2+piece_diameter*2*i,
+	        					x_offset+(piece_diameter/2)+piece_diameter*2+piece_diameter*4*j,
+	        					y_offset+(piece_diameter/2)+piece_diameter*2*i);
 	        		}
 	        	}
 	        }
@@ -829,10 +885,10 @@ public class Board extends JPanel{
 	        	for(int j = 0; j<columns; j++) {
 	        		if(game_board_array[j][i] == RED) {
 	        			g.setColor(Color.red);
-	        			g.fillOval(90+80*j, 75+80*i, 40, 40);
+	        			g.fillOval(x_offset+piece_diameter*2*j, y_offset+piece_diameter*2*i, piece_diameter, piece_diameter);
 	        		} else if(game_board_array[j][i] == BLACK) {
 	        			g.setColor(Color.black);
-	        			g.fillOval(90+80*j, 75+80*i, 40, 40);
+	        			g.fillOval(x_offset+piece_diameter*2*j, y_offset+piece_diameter*2*i, piece_diameter, piece_diameter);
 	        		} else if(game_board_array[j][i] == EMPTY) {
 	        			// draw nothing
 	        		}
@@ -842,18 +898,18 @@ public class Board extends JPanel{
 	        // draw pass button
 	        if (click_counter == 1 && extra_turn_flag == 1) {
 	        	g.setColor(Color.black);
-	        	g.drawRect(425, 500, 100, 25);
-	        	g.drawString("Pass", 450, 515);
+	        	g.drawRect(x_offset+columns*piece_diameter*2, (rows*piece_diameter), 75, 25);
+	        	g.drawString("Pass", x_offset+columns*piece_diameter*2+7, rows*piece_diameter+17);
 	        }
 	        // draw take options
 	        if (click_counter == 2) {
 	        	g.setColor(Color.black);
-	        	g.drawRect(425, 500, 100, 25);
-	        	g.drawRect(550, 500, 100, 25);
-	        	g.drawRect(675, 500, 100, 25);
-	        	g.drawString("Forward", 450, 515);
-	        	g.drawString("Backward", 575, 515);
-	        	g.drawString("No Take", 700, 515);
+	        	g.drawRect(x_offset+columns*piece_diameter*2, y_offset, 75, 25);
+	        	g.drawRect(x_offset+columns*piece_diameter*2, y_offset+piece_diameter*2, 75, 25);
+	        	g.drawRect(x_offset+columns*piece_diameter*2, y_offset+piece_diameter*4, 75, 25);
+	        	g.drawString("Forward", x_offset+columns*piece_diameter*2+7, y_offset+17);
+	        	g.drawString("Backward", x_offset+columns*piece_diameter*2+7, y_offset+17+piece_diameter*2);
+	        	g.drawString("No Take", x_offset+columns*piece_diameter*2+7, y_offset+17+piece_diameter*4);
 	        }
 		}
 
@@ -872,8 +928,8 @@ public class Board extends JPanel{
 	public void create_window() {
 		window = new JFrame("Fanorona");
 		window.setTitle("Fanorona Game");
-		window.setBounds(100, 100, 900, 600);
-		window.setResizable(false);
+		window.setBounds(400, 0, 950, 850);
+		window.setResizable(true);
 		window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);		
 		window.setVisible(true);
 		starting_time = (new Date()).getTime();
