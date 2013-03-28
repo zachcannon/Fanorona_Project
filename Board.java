@@ -30,6 +30,7 @@ public class Board extends JPanel{
 	int rows;
 	public int[][] game_board_array; //Set up in a [x][y] coordinate with [0][0] being the bottom left
 	int players_turn;
+	int difficulty_level;
 	
 	int extra_turn_flag;
 	
@@ -63,6 +64,7 @@ public class Board extends JPanel{
 		create_window();
 		extra_turn_flag = 0;
 		players_turn = 1;
+		difficulty_level = 1;
 	}	
 	
 	public void setup_board() {
@@ -537,28 +539,211 @@ public class Board extends JPanel{
 			who_am_i = player_number;
 			what_am_i = player_type;
 		}
-		
-		private int[] search_move(int my_num) { //Use the game_board_array and my_num to find out the best move for player my_num
-			int[] results_of_search = new int[5];
-			
-			//Code for move choice here. returns results_of_search[] where 0=old_x, 1=old_y, 2=new_x, 3=new_y, 4=direction to take
-			System.out.println("GOT INTO SEARCH_MOVE!!");
-			
-			return results_of_search;
+
+		private int board_state_evaluator(int[][] board_to_eval) {
+			return 0;
 		}
 		
-		@Override
+		private int[][] execute_a_move(int[][] current_board, int[] move_list, int whose_turn) {
+			int[][] resulting_board = new int[columns][rows];
+
+			for(int i = 0; i<columns; i++) {
+				for(int j = 0; j<rows; j++) {
+					resulting_board[i][j] = current_board[i][j];
+				}
+			}
+			
+			int old_x = move_list[0];
+			int old_y = move_list[1];
+			int new_x = move_list[2];
+			int new_y = move_list[3];
+			int direction = move_list[4]; //forward or back
+			
+			resulting_board[old_x][old_y] = EMPTY;
+			resulting_board[new_x][new_y] = whose_turn;
+			
+			int direction_x = new_x-old_x;
+			int direction_y = new_y-old_y;
+			
+			for(int i = 1; i < 10; i++) {
+				if (direction == 1) { //forward
+				if( (new_x+(direction_x*i)) >= 0 && (new_x+(direction_x*i)) < columns && (new_y+(direction_y*i)) >= 0 && (new_y+(direction_y*i)) < rows) { //still on board
+					if ( resulting_board[new_x+(direction_x*i)][new_y+(direction_y*i)] != whose_turn && resulting_board[new_x+(direction_x*i)][new_y+(direction_y*i)] != EMPTY) {
+						resulting_board[new_x+(direction_x*i)][new_y+(direction_y*i)] = EMPTY;
+					} else {
+						break;
+					}
+				} else {
+					break;
+				}
+				} else { //backward
+					if( (new_x-((direction_x*i)+1)) >= 0 && (new_x+((direction_x*i)+1)) < columns && (new_y+((direction_y*i)+1)) >= 0 && (new_y+((direction_y*i)+1)) < rows) { //still on board
+						if ( resulting_board[new_x+((direction_x*i)+1)][new_y+((direction_y*i)+1)] != whose_turn && resulting_board[new_x+((direction_x*i)+1)][new_y+((direction_y*i)+1)] != EMPTY) {
+							resulting_board[new_x+((direction_x*i)+1)][new_y+((direction_y*i)+1)] = EMPTY;
+						} else {
+							break;
+						}
+					} else {
+						break;
+					}				
+				}
+			}
+			
+			
+			return resulting_board;
+		}
+		
+		private int[] list_possible_moves(int[][] current_board, int whose_turn, int number_pass_thru) {
+			ArrayList<int[]> list_of_moves = new ArrayList<int[]>(); //Each "move" is 0=old_x, 1=old_y, 2=new_x, 3=new_y, 4=direction to take, 5=resulting board value
+			ArrayList<int[][]> board_holder = new ArrayList<int[][]>();
+					
+			for(int i = 0; i<columns; i++) { //Iterate through whole array
+				for(int j = 0; j<rows; j++) {
+					if(current_board[i][j] == whose_turn) { //Is this my piece? Yes
+						
+						//North South East and West moves
+						
+						if (j+1 < rows) {
+						if (current_board[i+0][j+1] == EMPTY) { //South of location
+							//System.out.println("Piece " + i +","+ j + " has a move.");
+							//System.out.println("Found piece: " + (i+0)+ ","+(j+1));
+							System.out.println("9 ---------");
+							list_of_moves.add(new int[]{i,j,i+0,j+1,1,0});
+							list_of_moves.add(new int[]{i,j,i+0,j+1,2,0});
+						}
+						} 
+						if (i+1 < columns) {
+						if (current_board[i+1][j+0] == EMPTY) { //East of location
+							//System.out.println("Piece " + i +","+ j + " has a move.");
+							//System.out.println("Found piece: " + (i+1)+ ","+(j+0));
+							System.out.println("10 ---------");
+							list_of_moves.add(new int[]{i,j,i+1,j+0,1,0});
+							list_of_moves.add(new int[]{i,j,i+1,j+0,2,0});
+						} 
+						}
+						if (j-1 >= 0) {
+						if (current_board[i+0][j-1] == EMPTY) { //North of location
+							//System.out.println("Piece " + i +","+ j + " has a move.");
+							//System.out.println("Found piece: " + (i+0)+ ","+(j-1));
+							System.out.println("11 ---------");
+							list_of_moves.add(new int[]{i,j,i+0,j-1,1,0});
+							list_of_moves.add(new int[]{i,j,i+0,j-1,2,0});
+						} 
+						}
+						if (i-1 >= 0) {
+						if (current_board[i-1][j+0] == EMPTY) { //West of location
+							//System.out.println("Piece " + i +","+ j + " has a move.");
+							//System.out.println("Found piece: " + (i-1)+ ","+(j+0));
+
+							System.out.println("12 ---------");
+							list_of_moves.add(new int[]{i,j,i-1,j+0,1,0});
+							list_of_moves.add(new int[]{i,j,i-1,j+0,2,0});
+						} 
+						}
+						
+						
+						if((i+j)%2 == 0) { //If piece can move 8 compass directions, fill in NE SE NW SW							
+							if (i+1 < columns && j+1 < rows) {
+							if (current_board[i+1][j+1] == EMPTY) { //Southeast of location
+								//System.out.println("Piece " + i +","+ j + " has a move.");
+								//System.out.println("Found piece: " + (i+1)+ ","+(j+1));
+
+								System.out.println("2 ---------");
+								list_of_moves.add(new int[]{i,j,i+1,j+1,1,0});
+								list_of_moves.add(new int[]{i,j,i+1,j+1,2,0});
+							} 
+							}							
+							if (i+1 < columns && j-1 >= 0) {
+							if (current_board[i+1][j-1] == EMPTY) { //Northeast of location
+								//System.out.println("Piece " + i +","+ j + " has a move.");
+								//System.out.println("Found piece: " + (i+1)+ ","+(j-1));
+								System.out.println("4 ---------");
+								list_of_moves.add(new int[]{i,j,i+1,j-1,1,0});
+								list_of_moves.add(new int[]{i,j,i+1,j-1,2,0});
+							} 
+							}							
+							if (i-1 >= 0 && j-1 >= 0) {
+							if (current_board[i-1][j-1] == EMPTY) { //Northwest of location
+								//System.out.println("Piece " + i +","+ j + " has a move.");
+								//System.out.println("Found piece: " + (i-1)+ ","+(j-1));
+								System.out.println("6 ---------");								
+								list_of_moves.add(new int[]{i,j,i-1,j-1,1,0});
+								list_of_moves.add(new int[]{i,j,i-1,j-1,2,0});
+							} 
+							}							
+							if (i-1 >= 0 && j+1 < rows) {
+							if (current_board[i-1][j+1] == EMPTY) { //Southwest of location
+								//System.out.println("Piece " + i +","+ j + " has a move.");
+								//System.out.println("Found piece: " + (i-1)+ ","+(j+1));
+
+								System.out.println("8 ---------");
+								list_of_moves.add(new int[]{i,j,i-1,j+1,1,0});
+								list_of_moves.add(new int[]{i,j,i-1,j+1,2,0});
+							} 
+							}
+						} 
+					}
+				}
+			}
+						//-------------------FROM HERE UP WORKS FINE------------
+			for(int i = 0; i<list_of_moves.size(); i++) {
+				int[] current_move_info = list_of_moves.get(i);
+				int old_x = current_move_info[0];
+				int old_y = current_move_info[1];
+				int new_x = current_move_info[2];
+				int new_y = current_move_info[3];
+				int direction = current_move_info[4];
+				
+				System.out.println("Piece: "+old_x+","+old_y+ "   has move to: " + new_x+","+new_y + " in direction:" + direction);
+				//Make board as if this move took place, store in board_holder at position i;
+				int [][] resulting_board_ = new int[columns][rows];
+				resulting_board_ = execute_a_move(current_board, current_move_info, whose_turn);
+				board_holder.add(resulting_board_);
+				//current_move_into[5] = board_state_evaluator(board_holder.get(i));
+				list_of_moves.set(i, current_move_info);
+			}
+			
+			if(number_pass_thru < difficulty_level){ //If not easy difficulty level  ----THIS CODE FROM HERE ON IS SHITTY. PROLLY NEEDS REVISION.
+				for(int i = 0; i<board_holder.size(); i++) {
+					if(whose_turn == 1) {
+						int[] current_best = list_of_moves.get(i);
+						int[] result = list_possible_moves(board_holder.get(i), 2, number_pass_thru+1);
+						if (result[5] > current_best[5]) {
+							list_of_moves.set(i, result);
+						}
+					} else {
+						int[] current_best = list_of_moves.get(i);
+						int[] result = list_possible_moves(board_holder.get(i), 1, number_pass_thru+1);
+						if (result[5] > current_best[5]) {
+							list_of_moves.set(i, result);
+						}
+					}
+				}
+			}
+			
+			int highest = 0;
+			int place = -1;
+			for(int i = 0; i<list_of_moves.size(); i++) {
+				int[] current_move_info = list_of_moves.get(i);
+				if(current_move_info[5] >= highest) {
+					highest = current_move_info[5];
+					place = i;
+				}
+			}
+			return list_of_moves.get(place);			
+		}
+		
+				@Override
 		public void execute_move(int[] array_of_moves) {
-			int my_num = array_of_moves[0];
 			int[] results_of_search = new int[5];
 			
-			results_of_search = search_move(my_num);
+			results_of_search = list_possible_moves(game_board_array, this.get_who_i_am(), difficulty_level);
 			
 			results_of_search[0] = 5;//to be commented
 			results_of_search[1] = 4;//to be commented
 			results_of_search[2] = 5;//to be commented
 			results_of_search[3] = 3;//to be commented
-			results_of_search[4] = 1;//to be commented
+			results_of_search[4] = 0;//to be commented
 			
 			int old_x = results_of_search[0];
 			int old_y = results_of_search[1];
