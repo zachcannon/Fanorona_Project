@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.swing.*;
@@ -107,6 +108,31 @@ public class Board extends JPanel{
 		else return 0;
 	}	
 	
+	public int get_direction(int old_x, int old_y, int new_x, int new_y) {
+		if(old_x < new_x) { //East move		
+			if(old_y < new_y) { //South
+				return 4;
+			} else if (old_y > new_y){
+				return 2;
+			} else {
+				return 3;
+			}
+		} else if (old_x > new_x) { //West move
+			if(old_y < new_y) { //NORTH
+				return 6;
+			} else if (old_y > new_y){ //South
+				return 8;
+			} else {
+				return 7;
+			}
+		} else { //NORTH OR SOUTH
+			if(old_y < new_y) { //NORTH
+				return 5;
+			} else {
+				return 1;
+			}
+		}
+	}
 	//---------------------------PLAYER_CLASS--------------------------//
 	
 	public abstract class Player {
@@ -127,6 +153,9 @@ public class Board extends JPanel{
 			if(game_board_array[old_x][old_y] != players_turn) return 0; //Position clicked does not hold a piece of the player in charge
 			
 			if(game_board_array[new_x][new_y] != 0) return 0; //If the position to move to is not empty
+			
+			// players can only move 1 space at a time
+			if (Math.abs(old_x-new_x) > 1 || Math.abs(old_y-new_y) > 1) return 0;
 			
 			// a player can move left/right as long there is nothing in their path
 			if (new_y == old_y) {
@@ -224,6 +253,8 @@ public class Board extends JPanel{
 			return 1;
 		}
 		public void erase_pieces(int new_x, int new_y, int compass_direction, int direction_to_take) {
+			extra_turn_flag = 0;
+			
 			if (direction_to_take == 0) return;
 			
 			if (compass_direction == 1) { //NORTH --DONE!!!
@@ -602,6 +633,14 @@ public class Board extends JPanel{
 		int[] player_1_sac_move;
 		int[] player_2_sac_move;
 		
+		// here we will store the previous locations that a piece has been
+		// to within the same turn (cannot be at the same location twice)
+		// also we cannot move in the same direction twice
+		// 0=no prev direction, 1 = N, 2 = NE, 3 = W, 4 = SW, etc..
+		ArrayList<Integer> prev_locations;
+		int prev_direction;
+		
+		
 		public BoardGraphics() {
 			if (player_1.get_what_i_am() == 1) {
 				game_message = "Welcome to Fanorona! CPU Player One's turn, click anywhere to execute it's move";
@@ -620,6 +659,8 @@ public class Board extends JPanel{
 			setBackground(Color.white);
 			is_game_over = false;
 			begining_of_move = new Date().getTime();
+			prev_locations = new ArrayList<Integer>();
+			prev_direction = -1;
 		}	
 		
 		
@@ -657,6 +698,7 @@ public class Board extends JPanel{
 				passing[0] = players_turn;
 				player_1.execute_move(passing);
 				move_counter++;
+				extra_turn_flag = 0;
 				players_turn = 2;
 				if (player_2.get_what_i_am() == 1) {
 					game_message = "CPU Player Two's turn, click anywhere to execute it's move";
@@ -673,6 +715,7 @@ public class Board extends JPanel{
 				passing[0] = players_turn;
 				player_2.execute_move(passing);
 				move_counter++;
+				extra_turn_flag = 0;
 				players_turn = 1;
 				if (player_1.get_what_i_am() == 1) {
 					game_message = "CPU Player One's turn, click anywhere to execute it's move";
@@ -711,6 +754,7 @@ public class Board extends JPanel{
 						game_message = "Player 1 (Black) select a piece to move";
 					}
 				}
+				prev_direction = -1;
 				click_counter = 0;
 				move_counter++;
 				begining_of_move = new Date().getTime();
@@ -776,12 +820,35 @@ public class Board extends JPanel{
 					return;
 				}
 				
+				// next lets make sure the player is not trying to move in the same direction if
+				// they took pieces previously
+				if ((get_direction(move[0], move[1], move[2], move[3]) == prev_direction)
+						|| (get_direction(move[0], move[1], move[2], move[3]) == prev_direction%4)
+						|| (get_direction(move[0], move[1], move[2], move[3]) == 0 && prev_direction == 4)
+						|| (get_direction(move[0], move[1], move[2], move[3]) == 4 && prev_direction == 0)) {
+					game_message = "You cannot move in the same direction! Please select a different direction or pass";
+					click_counter = 1;
+					repaint();
+					return;
+				}
+				
+				// we also need to make sure they are not visiting a spot previously visited
+				for (int i=0; i<prev_locations.size()-1; ++i) {
+					if (i%2 == 0 && move[2] == prev_locations.get(i)) {
+						if (move[3] == prev_locations.get(i+1)) {
+							game_message = "You've already visited ("+move[2]+","+move[3]+")! Please select another location to move to";
+							click_counter = 1;
+							repaint();
+							return;
+						}
+					}
+				}
+				
 				/* bounds for buttons:
 				g.drawRect(x_offset+columns*piece_diameter*2, y_offset, 75, 25);
 	        	g.drawRect(x_offset+columns*piece_diameter*2, y_offset+piece_diameter*2, 75, 25);
 	        	g.drawRect(x_offset+columns*piece_diameter*2, y_offset+piece_diameter*4, 75, 25);
 	        	*/
-				extra_turn_flag = 0;
 				if (x > x_offset+columns*piece_diameter*2 && x < x_offset+columns*piece_diameter*2+75
 					&& y > y_offset && y < y_offset+25) { //forward
 					move[4] = 1;
@@ -802,10 +869,17 @@ public class Board extends JPanel{
 					repaint();
 					return;
 				}
+				
+				// execute the move for either player 1 or player 2
 				if (players_turn == 1) {
 					if (player_1.check_valid_move(move) == 1) {
 						player_1.execute_move(move);
 						if (extra_turn_flag == 1) {
+							// add location to location array
+							prev_locations.add(move[2]);
+							prev_locations.add(move[3]);
+							// set previous direction
+							prev_direction = get_direction(move[0], move[1], move[2], move[3]);
 							// the player took some pieces they get to go again
 							game_message = "Player 1 (Black) select where to move ("+move[0]+","+move[1]+") or pass";
 							move[0] = move[2];
@@ -813,6 +887,8 @@ public class Board extends JPanel{
 							click_counter = 1;
 						}
 						else {
+							prev_locations.clear();
+							prev_direction = -1;
 							players_turn = 2;
 							//check if player 2 is a CPU
 							if (player_2.get_what_i_am() == 1) {
@@ -821,6 +897,7 @@ public class Board extends JPanel{
 							else {
 								game_message = "Player 2 (Red) select a piece to move";
 							}
+							extra_turn_flag = 0;
 							begining_of_move = new Date().getTime();
 							move_counter++;
 						}
@@ -829,10 +906,8 @@ public class Board extends JPanel{
 					}
 					else {
 						if (extra_turn_flag == 1) {
-							// the player took some pieces they get to go again
-							game_message = "Invalid move! Player 1 (Black) select where to move ("+move[2]+","+move[3]+") or pass";
-							move[0] = move[2];
-							move[1] = move[3];
+							// the player took some pieces but then made invalid move
+							game_message = "Invalid move! Player 1 (Black) select where to move ("+move[0]+","+move[1]+") or pass";
 							click_counter = 1;
 						}
 						else {
@@ -847,6 +922,11 @@ public class Board extends JPanel{
 						player_2.execute_move(move);
 						// else its player one's turn
 						if (extra_turn_flag == 1) {
+							// add location to location array
+							prev_locations.add(move[2]);
+							prev_locations.add(move[3]);
+							//set previous direction
+							prev_direction = get_direction(move[0], move[1], move[2], move[3]);
 							// the player took some pieces they get to go again
 							game_message = "Player 2 (Red) select where to move ("+move[2]+","+move[3]+") or pass";
 							move[0] = move[2];
@@ -854,7 +934,10 @@ public class Board extends JPanel{
 							click_counter = 1;
 						}
 						else {
+							prev_locations.clear();
+							prev_direction = -1;
 							players_turn = 1;
+							extra_turn_flag = 0;
 							game_message = "Player 1 (Black) select a piece to move";
 							begining_of_move = new Date().getTime();
 							move_counter++;
@@ -864,10 +947,8 @@ public class Board extends JPanel{
 					}
 					else {
 						if (extra_turn_flag == 1) {
-							// the player took some pieces they get to go again
-							game_message = "Invalid move! Player 2 (Red) select where to move ("+move[2]+","+move[3]+") or pass";
-							move[0] = move[2];
-							move[1] = move[3];
+							// the player took some pieces but then made invalid move
+							game_message = "Invalid move! Player 2 (Red) select where to move ("+move[0]+","+move[1]+") or pass";
 							click_counter = 1;
 						}
 						else {
@@ -933,7 +1014,7 @@ public class Board extends JPanel{
 				}
 				// basic error checking
 				if (game_board_array[row][col] == EMPTY) {
-					// crazy complicated error checking
+					// complicated error checking
 					// if the point we are sums up to be odd we can only move N, S, E, W
 					// for example (0, 1) would be only be able to move N, W, E, W
 					// since 0+1 = 1 and 1 is odd
@@ -952,6 +1033,7 @@ public class Board extends JPanel{
 					// we need to update the game_message and let the user select a direction
 					game_message = "moving ("+move[0]+","+move[1]+") to ("+row+","+col+") Please select a direction to take.";
 					repaint();
+					
 				}
 				// else its not a valid move
 				else {
