@@ -540,11 +540,11 @@ public class Board extends JPanel{
 			what_am_i = player_type;
 		}
 
-		private int board_state_evaluator(int[][] board_to_eval) {
+		private int board_state_evaluator(int[][] board_to_eval) { //Looks at the board and assigns it a value based on players_turn
 			return 0;
 		}
 		
-		private int[][] execute_a_move(int[][] current_board, int[] move_list, int whose_turn) {
+		private int[][] execute_a_move(int[][] current_board, int[] move_list, int whose_turn) { //Create a new board based on a possible move occurring
 			int[][] resulting_board = new int[columns][rows];
 
 			for(int i = 0; i<columns; i++) {
@@ -609,7 +609,10 @@ public class Board extends JPanel{
 							//System.out.println("Found piece: " + (i+0)+ ","+(j+1));
 							System.out.println("9 ---------");
 							list_of_moves.add(new int[]{i,j,i+0,j+1,1,0});
-							list_of_moves.add(new int[]{i,j,i+0,j+1,2,0});
+							if (j-1 >= 0){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
+								if (current_board[i+0][j-1] != EMPTY && current_board[i+0][j-1] != whose_turn)
+									list_of_moves.add(new int[]{i,j,i+0,j+1,2,0});
+							}
 						}
 						} 
 						if (i+1 < columns) {
@@ -618,7 +621,10 @@ public class Board extends JPanel{
 							//System.out.println("Found piece: " + (i+1)+ ","+(j+0));
 							System.out.println("10 ---------");
 							list_of_moves.add(new int[]{i,j,i+1,j+0,1,0});
-							list_of_moves.add(new int[]{i,j,i+1,j+0,2,0});
+							if (i-1 >= 0){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
+								if (current_board[i-1][j+0] != EMPTY && current_board[i-1][j+0] != whose_turn)
+									list_of_moves.add(new int[]{i,j,i+1,j+0,2,0});
+							}
 						} 
 						}
 						if (j-1 >= 0) {
@@ -627,7 +633,10 @@ public class Board extends JPanel{
 							//System.out.println("Found piece: " + (i+0)+ ","+(j-1));
 							System.out.println("11 ---------");
 							list_of_moves.add(new int[]{i,j,i+0,j-1,1,0});
-							list_of_moves.add(new int[]{i,j,i+0,j-1,2,0});
+							if (j+1 < rows){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
+								if (current_board[i+0][j+1] != EMPTY && current_board[i+0][j+1] != whose_turn)
+									list_of_moves.add(new int[]{i,j,i+0,j-1,2,0});
+							}
 						} 
 						}
 						if (i-1 >= 0) {
@@ -637,7 +646,10 @@ public class Board extends JPanel{
 
 							System.out.println("12 ---------");
 							list_of_moves.add(new int[]{i,j,i-1,j+0,1,0});
-							list_of_moves.add(new int[]{i,j,i-1,j+0,2,0});
+							if (i+1 < columns){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
+								if (current_board[i+1][j+0] != EMPTY && current_board[i+1][j+0] != whose_turn)
+									list_of_moves.add(new int[]{i,j,i-1,j+0,2,0});
+							}
 						} 
 						}
 						
@@ -650,7 +662,10 @@ public class Board extends JPanel{
 
 								System.out.println("2 ---------");
 								list_of_moves.add(new int[]{i,j,i+1,j+1,1,0});
-								list_of_moves.add(new int[]{i,j,i+1,j+1,2,0});
+								if (j-1 >= 0 && i-1 >= 0){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
+									if (current_board[i-1][j-1] != EMPTY && current_board[i-1][j-1] != whose_turn)
+										list_of_moves.add(new int[]{i,j,i+1,j+1,2,0});
+								}
 							} 
 							}							
 							if (i+1 < columns && j-1 >= 0) {
@@ -659,7 +674,10 @@ public class Board extends JPanel{
 								//System.out.println("Found piece: " + (i+1)+ ","+(j-1));
 								System.out.println("4 ---------");
 								list_of_moves.add(new int[]{i,j,i+1,j-1,1,0});
-								list_of_moves.add(new int[]{i,j,i+1,j-1,2,0});
+								if (i-1 >= 0 && j+1 < rows){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
+									if (current_board[i-1][j+1] != EMPTY && current_board[i-1][j+1] != whose_turn)
+										list_of_moves.add(new int[]{i,j,i+1,j-1,2,0});
+								}
 							} 
 							}							
 							if (i-1 >= 0 && j-1 >= 0) {
@@ -668,7 +686,10 @@ public class Board extends JPanel{
 								//System.out.println("Found piece: " + (i-1)+ ","+(j-1));
 								System.out.println("6 ---------");								
 								list_of_moves.add(new int[]{i,j,i-1,j-1,1,0});
-								list_of_moves.add(new int[]{i,j,i-1,j-1,2,0});
+								if (i+1 < columns && j+1 < rows){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
+									if (current_board[i+1][j+1] != EMPTY && current_board[i+1][j+1] != whose_turn)
+										list_of_moves.add(new int[]{i,j,i-1,j-1,2,0});
+								}
 							} 
 							}							
 							if (i-1 >= 0 && j+1 < rows) {
@@ -678,7 +699,10 @@ public class Board extends JPanel{
 
 								System.out.println("8 ---------");
 								list_of_moves.add(new int[]{i,j,i-1,j+1,1,0});
-								list_of_moves.add(new int[]{i,j,i-1,j+1,2,0});
+								if (i+1 < columns && j-1 >= 0){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
+									if (current_board[i+1][j-1] != EMPTY && current_board[i+1][j-1] != whose_turn)
+										list_of_moves.add(new int[]{i,j,i-1,j+1,2,0});
+								}
 							} 
 							}
 						} 
@@ -699,6 +723,7 @@ public class Board extends JPanel{
 				int [][] resulting_board_ = new int[columns][rows];
 				resulting_board_ = execute_a_move(current_board, current_move_info, whose_turn);
 				board_holder.add(resulting_board_);
+				
 				//current_move_into[5] = board_state_evaluator(board_holder.get(i));
 				list_of_moves.set(i, current_move_info);
 			}
@@ -742,7 +767,7 @@ public class Board extends JPanel{
 			results_of_search[0] = 5;//to be commented
 			results_of_search[1] = 4;//to be commented
 			results_of_search[2] = 5;//to be commented
-			results_of_search[3] = 3;//to be commented
+			results_of_search[3] = 4;//to be commented
 			results_of_search[4] = 0;//to be commented
 			
 			int old_x = results_of_search[0];
