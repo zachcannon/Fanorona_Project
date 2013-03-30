@@ -1007,6 +1007,7 @@ public class Board extends JPanel{
 						game_message = "Player 1 (Black) select a piece to move";
 					}
 				}
+				prev_locations.clear();
 				click_counter = 0;
 				move_counter++;
 				begining_of_move = new Date().getTime();
@@ -1195,6 +1196,8 @@ public class Board extends JPanel{
 					|| (players_turn == 2 && game_board_array[row][col] == RED)) {
 					move[0] = row;
 					move[1] = col;
+					prev_locations.add(move[0]);
+					prev_locations.add(move[1]);
 					click_counter++;
 					game_message = "You have selected to move ("+row+","+col+"), please select where to move. Click this piece again to select another piece to move";
 					repaint();
@@ -1209,8 +1212,8 @@ public class Board extends JPanel{
 			// is this is click number two, this is where they want to move
 			// so we store "new x" and "new y"
 			else if (click_counter == 1) {
-				// if the user clicks the same piece we want to start over
-				if (row == move[0] && col == move[1]) {
+				// if the user clicks the same piece we want to start over (unless they just took pieces)
+				if (row == move[0] && col == move[1] && extra_turn_flag == 0) {
 					click_counter = 0;
 					if (players_turn == 1) {
 						game_message = "Player 1 (Black) Select a piece to move";
