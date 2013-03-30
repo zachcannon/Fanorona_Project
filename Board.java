@@ -39,7 +39,7 @@ public class Board extends JPanel{
 	
 	
 	//----------------------------MAIN_GAME----------------------------//	
-	public Board(int number_type, int cols, int rows_, long time_limit) { //Constructor
+	public Board(int number_type, int cols, int rows_, long time_limit, int diff) { //Constructor
 		columns = cols;
 		rows = rows_;
 		turn_time_limit = time_limit;
@@ -64,7 +64,7 @@ public class Board extends JPanel{
 		create_window();
 		extra_turn_flag = 0;
 		players_turn = 1;
-		difficulty_level = 1;
+		difficulty_level = diff;
 	}	
 	
 	public void setup_board() {
@@ -964,6 +964,7 @@ public class Board extends JPanel{
 						game_message = "Player 1 (Black) select a piece to move";
 					}
 				}
+				prev_locations.clear();
 				prev_direction = -1;
 				click_counter = 0;
 				move_counter++;

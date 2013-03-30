@@ -12,19 +12,22 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
 
 public class GameSelect extends JFrame {
 	
 	GameRun thegame = new GameRun();
 	private JPanel contentPane;
-	private JTextField txtColumns;
-	private JTextField txtRows;
 	private JTextField txtTimeLimitms;
 	
 	int cols_;
 	int rows_;
 	String cols;
 	String rows;
+	
+	int diff_; // 1 for easy, 3 for hard
+	String diff;
 	
 	String time_limit;
 	long time_limit_;
@@ -55,7 +58,7 @@ public class GameSelect extends JFrame {
 		// game mode he wants to play
 		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 311, 274);
+		setBounds(100, 100, 311, 311);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -68,6 +71,29 @@ public class GameSelect extends JFrame {
 		lblSelectGameType.setBounds(10, 0, 275, 45);
 		contentPane.add(lblSelectGameType);
 		
+		// Boxes and text fields
+		txtTimeLimitms = new JTextField();
+		txtTimeLimitms.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		txtTimeLimitms.setText("Time Limit (ms)");
+		txtTimeLimitms.setBounds(95, 73, 110, 20);
+		contentPane.add(txtTimeLimitms);
+		txtTimeLimitms.setColumns(10);
+		
+		final JComboBox colBox = new JComboBox();
+		colBox.setModel(new DefaultComboBoxModel(new String[] {"Columns", "3", "5", "7", "9", "11", "13"}));
+		colBox.setBounds(10, 42, 86, 20);
+		contentPane.add(colBox);
+		
+		final JComboBox rowBox = new JComboBox();
+		rowBox.setModel(new DefaultComboBoxModel(new String[] {"Rows", "3", "5", "7", "9", "11", "13"}));
+		rowBox.setBounds(106, 42, 86, 20);
+		contentPane.add(rowBox);
+		
+		final JComboBox diffBox = new JComboBox();
+		diffBox.setModel(new DefaultComboBoxModel(new String[] {"Difficulty", "Easy", "Hard"}));
+		diffBox.setBounds(202, 42, 83, 20);
+		contentPane.add(diffBox);
+		
 		// Human vs Human button
 		// button will call the functions in HumanVsHuman Class
 		// also the window will close after the user makes the selection
@@ -75,33 +101,27 @@ public class GameSelect extends JFrame {
 		btnHumanVsHuman.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//System.out.println("Human vs Human Selected\n");
-				cols = txtColumns.getText();
-				rows = txtRows.getText();
-				if (cols.equals("Columns") || cols.equals("")) {
+				cols = (String) colBox.getSelectedItem();
+				rows = (String) rowBox.getSelectedItem();
+				diff = (String) diffBox.getSelectedItem();
+				if (cols.equals("Columns")) {
 					cols_ = 9;
 				}
 				else {
 					cols_ = Integer.parseInt(cols);
 				}
-				if (rows.equals("Rows") || rows.equals("")) {
+				if (rows.equals("Rows")) {
 					rows_ = 5;
 				}
 				else {
 					rows_ = Integer.parseInt(rows);
 				}
-				if (cols_ <= 0 || cols_ > 13) {
-					cols_ = 9;
+				if (diff.equals("Difficulty") || diff.equals("Easy")) {
+					diff_ = 1;
 				}
-				if (rows_ <= 0 || rows_ > 13) {
-					rows_ = 9;
+				else {
+					diff_ = 3;
 				}
-				if (cols_ == 2 || cols_ == 4 || cols_ == 6 || cols_ == 8 || cols_ == 10 ||cols_ == 12 ) {
-					cols_ = cols_+1;
-				}
-				if (rows_ == 2 || rows_ == 4 || rows_ == 6 || rows_ == 8 || rows_ == 10 ||rows_ == 12 ) {
-					rows_ = rows_+1;
-				}
-				
 				time_limit = txtTimeLimitms.getText();
 				if (time_limit.equals("Time Limit (ms)") || time_limit.equals("")) {
 					// default to ten minutes
@@ -110,11 +130,11 @@ public class GameSelect extends JFrame {
 				else {
 					time_limit_ = Long.parseLong(time_limit);
 				}
-				thegame.run_game(0, cols_, rows_, time_limit_);				
+				thegame.run_game(0, cols_, rows_, time_limit_, diff_);				
 				dispose();
 			}
 		});
-		btnHumanVsHuman.setBounds(10, 71, 275, 45);
+		btnHumanVsHuman.setBounds(10, 104, 275, 45);
 		contentPane.add(btnHumanVsHuman);
 		
 		// Human vs CPU
@@ -122,33 +142,27 @@ public class GameSelect extends JFrame {
 		btnHumanVsCpu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				//System.out.println("Human vs CPU Selected\n");
-				cols = txtColumns.getText();
-				rows = txtRows.getText();
-				if (cols.equals("Columns") || cols.equals("")) {
+				cols = (String) colBox.getSelectedItem();
+				rows = (String) rowBox.getSelectedItem();
+				diff = (String) diffBox.getSelectedItem();
+				if (cols.equals("Columns")) {
 					cols_ = 9;
 				}
 				else {
 					cols_ = Integer.parseInt(cols);
 				}
-				if (rows.equals("Rows") || rows.equals("")) {
+				if (rows.equals("Rows")) {
 					rows_ = 5;
 				}
 				else {
 					rows_ = Integer.parseInt(rows);
 				}
-				if (cols_ <= 0 || cols_ > 13) {
-					cols_ = 9;
+				if (diff.equals("Difficulty") || diff.equals("Easy")) {
+					diff_ = 1;
 				}
-				if (rows_ <= 0 || rows_ > 13) {
-					rows_ = 9;
+				else {
+					diff_ = 3;
 				}
-				if (cols_ == 2 || cols_ == 4 || cols_ == 6 || cols_ == 8 || cols_ == 10 ||cols_ == 12 ) {
-					cols_ = cols_+1;
-				}
-				if (rows_ == 2 || rows_ == 4 || rows_ == 6 || rows_ == 8 || rows_ == 10 ||rows_ == 12 ) {
-					rows_ = rows_+1;
-				}
-				
 				time_limit = txtTimeLimitms.getText();
 				if (time_limit.equals("Time Limit (ms)") || time_limit.equals("")) {
 					// default to ten minutes
@@ -157,11 +171,11 @@ public class GameSelect extends JFrame {
 				else {
 					time_limit_ = Long.parseLong(time_limit);
 				}
-				thegame.run_game(1, cols_, rows_, time_limit_);				
+				thegame.run_game(1, cols_, rows_, time_limit_, diff_);				
 				dispose();
 			}
 		});
-		btnHumanVsCpu.setBounds(10, 127, 275, 45);
+		btnHumanVsCpu.setBounds(10, 160, 275, 45);
 		contentPane.add(btnHumanVsCpu);
 		
 		// CPU vs CPU
@@ -169,33 +183,27 @@ public class GameSelect extends JFrame {
 		btnCpuVsCpu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//System.out.println("CPU vs CPU Selected\n");
-				cols = txtColumns.getText();
-				rows = txtRows.getText();
-				if (cols.equals("Columns") || cols.equals("")) {
+				cols = (String) colBox.getSelectedItem();
+				rows = (String) rowBox.getSelectedItem();
+				diff = (String) diffBox.getSelectedItem();
+				if (cols.equals("Columns")) {
 					cols_ = 9;
 				}
 				else {
 					cols_ = Integer.parseInt(cols);
 				}
-				if (rows.equals("Rows") || rows.equals("")) {
+				if (rows.equals("Rows")) {
 					rows_ = 5;
 				}
 				else {
 					rows_ = Integer.parseInt(rows);
 				}
-				if (cols_ <= 0 || cols_ > 13) {
-					cols_ = 9;
+				if (diff.equals("Difficulty") || diff.equals("Easy")) {
+					diff_ = 1;
 				}
-				if (rows_ <= 0 || rows_ > 13) {
-					rows_ = 9;
+				else {
+					diff_ = 3;
 				}
-				if (cols_ == 2 || cols_ == 4 || cols_ == 6 || cols_ == 8 || cols_ == 10 ||cols_ == 12 ) {
-					cols_ = cols_+1;
-				}
-				if (rows_ == 2 || rows_ == 4 || rows_ == 6 || rows_ == 8 || rows_ == 10 ||rows_ == 12 ) {
-					rows_ = rows_+1;
-				}
-				
 				time_limit = txtTimeLimitms.getText();
 				if (time_limit.equals("Time Limit (ms)") || time_limit.equals("")) {
 					// default to ten minutes
@@ -204,32 +212,11 @@ public class GameSelect extends JFrame {
 				else {
 					time_limit_ = Long.parseLong(time_limit);
 				}
-				thegame.run_game(2, cols_, rows_, time_limit_);				
+				thegame.run_game(2, cols_, rows_, time_limit_, diff_);				
 				dispose();
 			}
 		});
-		btnCpuVsCpu.setBounds(10, 183, 275, 45);
+		btnCpuVsCpu.setBounds(10, 216, 275, 45);
 		contentPane.add(btnCpuVsCpu);
-		
-		txtColumns = new JTextField();
-		txtColumns.setFont(new Font("Tahoma", Font.PLAIN, 9));
-		txtColumns.setText("Columns");
-		txtColumns.setBounds(10, 40, 86, 20);
-		contentPane.add(txtColumns);
-		txtColumns.setColumns(10);
-		
-		txtRows = new JTextField();
-		txtRows.setFont(new Font("Tahoma", Font.PLAIN, 9));
-		txtRows.setText("Rows");
-		txtRows.setBounds(103, 40, 86, 20);
-		contentPane.add(txtRows);
-		txtRows.setColumns(10);
-		
-		txtTimeLimitms = new JTextField();
-		txtTimeLimitms.setFont(new Font("Tahoma", Font.PLAIN, 9));
-		txtTimeLimitms.setText("Time Limit (ms)");
-		txtTimeLimitms.setBounds(199, 40, 86, 20);
-		contentPane.add(txtTimeLimitms);
-		txtTimeLimitms.setColumns(10);
 	}
 }
