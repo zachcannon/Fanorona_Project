@@ -876,7 +876,7 @@ public class Board extends JPanel{
 		
 		public void processClick(int x, int y) {
 			
-			if (is_game_over) {
+			if (is_game_over || click_counter == -1) {
 				return;
 			}
 			// check move count, if we are over then the game is a draw
@@ -904,6 +904,10 @@ public class Board extends JPanel{
 			
 			// if its a CPU's turn we need to execute its move
 			if (players_turn == 1 && player_1.get_what_i_am() == 1 && click_counter == 0) {
+				// "freeze" screen while CPU is making a move
+				click_counter = -1;
+				game_message = "CPU is processing what move to take...";
+				repaint();
 				int[] passing = new int[4];
 				passing[0] = players_turn;
 				player_1.execute_move(passing);
@@ -917,10 +921,15 @@ public class Board extends JPanel{
 					game_message = "Player 2 (Red) please select a piece to move";
 				}
 				begining_of_move = new Date().getTime();
+				click_counter = 0;
 				repaint();
 				return;
 			}
 			if (players_turn == 2 && player_2.get_what_i_am() == 1 && click_counter == 0) {
+				// "freeze" screen while CPU is making a move
+				click_counter = -1;
+				game_message = "CPU is processing what move to take...";
+				repaint();
 				int[] passing = new int[4];
 				passing[0] = players_turn;
 				player_2.execute_move(passing);
@@ -934,6 +943,7 @@ public class Board extends JPanel{
 					game_message = "Player 1 (Black) please select a piece to move";
 				}
 				begining_of_move = new Date().getTime();
+				click_counter = 0;
 				repaint();
 				return;
 			}
