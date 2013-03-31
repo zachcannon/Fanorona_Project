@@ -120,7 +120,7 @@ public class GameSelect extends JFrame {
 					diff_ = 1;
 				}
 				else {
-					diff_ = 3;
+					diff_ = 2;
 				}
 				time_limit = txtTimeLimitms.getText();
 				if (time_limit.equals("Time Limit (ms)") || time_limit.equals("")) {
@@ -202,7 +202,7 @@ public class GameSelect extends JFrame {
 					diff_ = 1;
 				}
 				else {
-					diff_ = 3;
+					diff_ = 2;
 				}
 				time_limit = txtTimeLimitms.getText();
 				if (time_limit.equals("Time Limit (ms)") || time_limit.equals("")) {

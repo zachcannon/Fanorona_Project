@@ -32,6 +32,8 @@ public class Board extends JPanel{
 	int players_turn;
 	int difficulty_level;
 	
+	int TEMP_PASS_COUNT;
+	
 	int extra_turn_flag;
 	
 	long starting_time;
@@ -65,6 +67,7 @@ public class Board extends JPanel{
 		extra_turn_flag = 0;
 		players_turn = 1;
 		difficulty_level = diff;
+		TEMP_PASS_COUNT = 0;
 	}	
 	
 	public void setup_board() {
@@ -541,7 +544,31 @@ public class Board extends JPanel{
 		}
 
 		private int board_state_evaluator(int[][] board_to_eval) { //Looks at the board and assigns it a value based on players_turn
-			return 0;
+			int red_pieces = 0;
+			int black_pieces = 0;
+			
+			for( int i = 0; i < columns; i++ ) {
+				for (int j = 0; j < rows; j++) {
+					if (board_to_eval[i][j] == BLACK) black_pieces++;
+					else if (board_to_eval[i][j] != RED) red_pieces++;
+				}
+			}
+			if (players_turn == BLACK && black_pieces == 0) { //Loss for black
+				return (-10000);
+			} else if (players_turn == BLACK && red_pieces == 0) { //Win for black
+				return (10000);
+			} else if (players_turn == RED && black_pieces == 0) { //Win for red
+				return (10000);
+			} else if (players_turn == RED && red_pieces == 0) { //Loss for red
+				return (-10000);
+			}
+			
+			if (players_turn == BLACK) {
+				return ((12*black_pieces)-(10*red_pieces));
+			} else {
+				return ((12*red_pieces)-(10*black_pieces));
+			}
+			
 		}
 		
 		private int[][] execute_a_move(int[][] current_board, int[] move_list, int whose_turn) { //Create a new board based on a possible move occurring
@@ -577,9 +604,9 @@ public class Board extends JPanel{
 					break;
 				}
 				} else { //backward
-					if( (new_x-((direction_x*i)+1)) >= 0 && (new_x+((direction_x*i)+1)) < columns && (new_y+((direction_y*i)+1)) >= 0 && (new_y+((direction_y*i)+1)) < rows) { //still on board
-						if ( resulting_board[new_x+((direction_x*i)+1)][new_y+((direction_y*i)+1)] != whose_turn && resulting_board[new_x+((direction_x*i)+1)][new_y+((direction_y*i)+1)] != EMPTY) {
-							resulting_board[new_x+((direction_x*i)+1)][new_y+((direction_y*i)+1)] = EMPTY;
+					if( (old_x-(direction_x*i)) >= 0 && (old_x-(direction_x*i)) < columns && (old_y-(direction_y*i)) >= 0 && (old_y-(direction_y*i)) < rows) { //still on board
+						if ( resulting_board[old_x-((direction_x*i))][old_y-((direction_y*i))] != whose_turn && resulting_board[old_x-((direction_x*i))][old_y-((direction_y*i))] != EMPTY) {
+							resulting_board[old_x-((direction_x*i))][old_y-((direction_y*i))] = EMPTY;
 						} else {
 							break;
 						}
@@ -593,7 +620,7 @@ public class Board extends JPanel{
 			return resulting_board;
 		}
 		
-		private int[] list_possible_moves(int[][] current_board, int whose_turn, int number_pass_thru) {
+		private int[] list_possible_moves(int[][] current_board, int whose_turn, int level_on_tree) {
 			ArrayList<int[]> list_of_moves = new ArrayList<int[]>(); //Each "move" is 0=old_x, 1=old_y, 2=new_x, 3=new_y, 4=direction to take, 5=resulting board value
 			ArrayList<int[][]> board_holder = new ArrayList<int[][]>();
 					
@@ -607,7 +634,7 @@ public class Board extends JPanel{
 						if (current_board[i+0][j+1] == EMPTY) { //South of location
 							//System.out.println("Piece " + i +","+ j + " has a move.");
 							//System.out.println("Found piece: " + (i+0)+ ","+(j+1));
-							System.out.println("9 ---------");
+							//System.out.println("9 ---------");
 							list_of_moves.add(new int[]{i,j,i+0,j+1,1,0});
 							if (j-1 >= 0){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
 								if (current_board[i+0][j-1] != EMPTY && current_board[i+0][j-1] != whose_turn)
@@ -619,7 +646,7 @@ public class Board extends JPanel{
 						if (current_board[i+1][j+0] == EMPTY) { //East of location
 							//System.out.println("Piece " + i +","+ j + " has a move.");
 							//System.out.println("Found piece: " + (i+1)+ ","+(j+0));
-							System.out.println("10 ---------");
+							//System.out.println("10 ---------");
 							list_of_moves.add(new int[]{i,j,i+1,j+0,1,0});
 							if (i-1 >= 0){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
 								if (current_board[i-1][j+0] != EMPTY && current_board[i-1][j+0] != whose_turn)
@@ -631,7 +658,7 @@ public class Board extends JPanel{
 						if (current_board[i+0][j-1] == EMPTY) { //North of location
 							//System.out.println("Piece " + i +","+ j + " has a move.");
 							//System.out.println("Found piece: " + (i+0)+ ","+(j-1));
-							System.out.println("11 ---------");
+							//System.out.println("11 ---------");
 							list_of_moves.add(new int[]{i,j,i+0,j-1,1,0});
 							if (j+1 < rows){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
 								if (current_board[i+0][j+1] != EMPTY && current_board[i+0][j+1] != whose_turn)
@@ -644,7 +671,7 @@ public class Board extends JPanel{
 							//System.out.println("Piece " + i +","+ j + " has a move.");
 							//System.out.println("Found piece: " + (i-1)+ ","+(j+0));
 
-							System.out.println("12 ---------");
+							//System.out.println("12 ---------");
 							list_of_moves.add(new int[]{i,j,i-1,j+0,1,0});
 							if (i+1 < columns){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
 								if (current_board[i+1][j+0] != EMPTY && current_board[i+1][j+0] != whose_turn)
@@ -660,7 +687,7 @@ public class Board extends JPanel{
 								//System.out.println("Piece " + i +","+ j + " has a move.");
 								//System.out.println("Found piece: " + (i+1)+ ","+(j+1));
 
-								System.out.println("2 ---------");
+								//System.out.println("2 ---------");
 								list_of_moves.add(new int[]{i,j,i+1,j+1,1,0});
 								if (j-1 >= 0 && i-1 >= 0){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
 									if (current_board[i-1][j-1] != EMPTY && current_board[i-1][j-1] != whose_turn)
@@ -672,7 +699,7 @@ public class Board extends JPanel{
 							if (current_board[i+1][j-1] == EMPTY) { //Northeast of location
 								//System.out.println("Piece " + i +","+ j + " has a move.");
 								//System.out.println("Found piece: " + (i+1)+ ","+(j-1));
-								System.out.println("4 ---------");
+								//System.out.println("4 ---------");
 								list_of_moves.add(new int[]{i,j,i+1,j-1,1,0});
 								if (i-1 >= 0 && j+1 < rows){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
 									if (current_board[i-1][j+1] != EMPTY && current_board[i-1][j+1] != whose_turn)
@@ -684,7 +711,7 @@ public class Board extends JPanel{
 							if (current_board[i-1][j-1] == EMPTY) { //Northwest of location
 								//System.out.println("Piece " + i +","+ j + " has a move.");
 								//System.out.println("Found piece: " + (i-1)+ ","+(j-1));
-								System.out.println("6 ---------");								
+								//System.out.println("6 ---------");								
 								list_of_moves.add(new int[]{i,j,i-1,j-1,1,0});
 								if (i+1 < columns && j+1 < rows){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
 									if (current_board[i+1][j+1] != EMPTY && current_board[i+1][j+1] != whose_turn)
@@ -697,7 +724,7 @@ public class Board extends JPanel{
 								//System.out.println("Piece " + i +","+ j + " has a move.");
 								//System.out.println("Found piece: " + (i-1)+ ","+(j+1));
 
-								System.out.println("8 ---------");
+								//System.out.println("8 ---------");
 								list_of_moves.add(new int[]{i,j,i-1,j+1,1,0});
 								if (i+1 < columns && j-1 >= 0){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
 									if (current_board[i+1][j-1] != EMPTY && current_board[i+1][j-1] != whose_turn)
@@ -711,64 +738,94 @@ public class Board extends JPanel{
 			}
 						//-------------------FROM HERE UP WORKS FINE------------
 			for(int i = 0; i<list_of_moves.size(); i++) {
-				int[] current_move_info = list_of_moves.get(i);
-				int old_x = current_move_info[0];
-				int old_y = current_move_info[1];
-				int new_x = current_move_info[2];
-				int new_y = current_move_info[3];
-				int direction = current_move_info[4];
-				
-				System.out.println("Piece: "+old_x+","+old_y+ "   has move to: " + new_x+","+new_y + " in direction:" + direction);
-				//Make board as if this move took place, store in board_holder at position i;
+				int[] current_move_info = new int[6];
+				current_move_info = list_of_moves.get(i);
 				int [][] resulting_board_ = new int[columns][rows];
 				resulting_board_ = execute_a_move(current_board, current_move_info, whose_turn);
 				board_holder.add(resulting_board_);
-				
-				//current_move_into[5] = board_state_evaluator(board_holder.get(i));
+				TEMP_PASS_COUNT++;
+				current_move_info[5] = board_state_evaluator(board_holder.get(i));
+				if (current_move_info[5] == 10000) return current_move_info; //Win condition
 				list_of_moves.set(i, current_move_info);
 			}
 			
-			if(number_pass_thru < difficulty_level){ //If not easy difficulty level  ----THIS CODE FROM HERE ON IS SHITTY. PROLLY NEEDS REVISION.
+			
+			
+			if(level_on_tree < difficulty_level){ //Does the tree level match the difficulty level? 
 				for(int i = 0; i<board_holder.size(); i++) {
+					int[] result_of_deeper = new int[6];
+					int[] current_best = new int[6];
 					if(whose_turn == 1) {
-						int[] current_best = list_of_moves.get(i);
-						int[] result = list_possible_moves(board_holder.get(i), 2, number_pass_thru+1);
-						if (result[5] > current_best[5]) {
-							list_of_moves.set(i, result);
-						}
+						current_best = list_of_moves.get(i);
+						result_of_deeper = list_possible_moves(board_holder.get(i), 2, level_on_tree+1);	
+							
+						current_best[5] = result_of_deeper[5];
+						list_of_moves.set(i, current_best); //Switch the values!! not move information
+						
 					} else {
-						int[] current_best = list_of_moves.get(i);
-						int[] result = list_possible_moves(board_holder.get(i), 1, number_pass_thru+1);
-						if (result[5] > current_best[5]) {
-							list_of_moves.set(i, result);
-						}
+						current_best = list_of_moves.get(i);
+						result_of_deeper = list_possible_moves(board_holder.get(i), 1, level_on_tree+1);
+						
+						current_best[5] = result_of_deeper[5];
+						list_of_moves.set(i, current_best);
+						
 					}
 				}
 			}
+			//Highest value passed back if players_turn = whose turn, else we want smallest move
 			
-			int highest = 0;
-			int place = -1;
-			for(int i = 0; i<list_of_moves.size(); i++) {
-				int[] current_move_info = list_of_moves.get(i);
-				if(current_move_info[5] >= highest) {
-					highest = current_move_info[5];
-					place = i;
+			if (whose_turn == players_turn) {
+				System.out.println("Looking for highest");
+				int highest = -10000;
+				int place = 0;
+				for(int i = 0; i<list_of_moves.size(); i++) {
+					int[] current_move_info = list_of_moves.get(i);
+					System.out.print(current_move_info[5]);
+					if (current_move_info[5] == 10000) return list_of_moves.get(i);
+					if(current_move_info[5] >= highest) {
+						highest = current_move_info[5];
+						place = i;
+					}
 				}
-			}
-			return list_of_moves.get(place);			
+				//System.out.println("   Returning: " + highest + "  OR   " + list_of_moves.get(place)[5]);
+				return list_of_moves.get(place);
+			} else {
+				System.out.println("Looking at lowest");
+				int lowest = 10000;
+				int place = 0;
+				for(int i = 0; i<list_of_moves.size(); i++) {
+					int[] current_move_info = list_of_moves.get(i);
+					System.out.print(current_move_info[5]);
+					if (current_move_info[5] == -10000) return list_of_moves.get(i);
+					if(current_move_info[5] <= lowest) {
+						lowest = current_move_info[5];
+						place = i;
+					}
+				}
+				//System.out.println("   Returning: " + lowest + "  OR   " + list_of_moves.get(place)[5]);
+				if(list_of_moves.size() == 0) { //End of game.
+					
+				}
+				return list_of_moves.get(place);
+			}			
 		}
 		
 				@Override
 		public void execute_move(int[] array_of_moves) {
+			TEMP_PASS_COUNT = 0;
+
+			System.out.println("Difficulty at: " + difficulty_level);
 			int[] results_of_search = new int[5];
 			
-			results_of_search = list_possible_moves(game_board_array, this.get_who_i_am(), difficulty_level);
+			results_of_search = list_possible_moves(game_board_array, this.get_who_i_am(), 1); //Looks at current gameboard, passes it computers color, and starts at tree level 1
+			System.out.println("FINALLY RETURNED");
+			//results_of_search[0] = 5;//to be commented
+			//results_of_search[1] = 4;//to be commented
+			//results_of_search[2] = 5;//to be commented
+			//results_of_search[3] = 4;//to be commented
+			//results_of_search[4] = 0;//to be commented
 			
-			results_of_search[0] = 5;//to be commented
-			results_of_search[1] = 4;//to be commented
-			results_of_search[2] = 5;//to be commented
-			results_of_search[3] = 4;//to be commented
-			results_of_search[4] = 0;//to be commented
+			System.out.println("PASS COUNT IS AT: " + TEMP_PASS_COUNT);
 			
 			int old_x = results_of_search[0];
 			int old_y = results_of_search[1];
