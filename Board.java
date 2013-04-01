@@ -624,6 +624,9 @@ public class Board extends JPanel{
 			ArrayList<int[]> list_of_moves = new ArrayList<int[]>(); //Each "move" is 0=old_x, 1=old_y, 2=new_x, 3=new_y, 4=direction to take, 5=resulting board value
 			ArrayList<int[][]> board_holder = new ArrayList<int[][]>();
 					
+			
+			ArrayList<int[]> taking_moves = new ArrayList<int[]>(); //If a move can take a piece, it goes into this list as well.
+			int taking_move_exists = 0; //If no taking move exists, then it stays 0, if one does exist, then 1
 			for(int i = 0; i<columns; i++) { //Iterate through whole array
 				for(int j = 0; j<rows; j++) {
 					if(current_board[i][j] == whose_turn) { //Is this my piece? Yes
@@ -632,50 +635,71 @@ public class Board extends JPanel{
 						
 						if (j+1 < rows) {
 						if (current_board[i+0][j+1] == EMPTY) { //South of location
-							//System.out.println("Piece " + i +","+ j + " has a move.");
-							//System.out.println("Found piece: " + (i+0)+ ","+(j+1));
-							//System.out.println("9 ---------");
 							list_of_moves.add(new int[]{i,j,i+0,j+1,1,0});
+							
+							if(j+2 < rows && current_board[i+0][j+2] != whose_turn && current_board[i+0][j+2] != EMPTY) { //A taking move
+								taking_moves.add(new int[]{i,j,i+0,j+1,1,0});
+								taking_move_exists = 1;
+							}
+							
 							if (j-1 >= 0){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
-								if (current_board[i+0][j-1] != EMPTY && current_board[i+0][j-1] != whose_turn)
-									list_of_moves.add(new int[]{i,j,i+0,j+1,2,0});
+								if (current_board[i+0][j-1] != EMPTY && current_board[i+0][j-1] != whose_turn) {
+									taking_moves.add(new int[]{i,j,i+0,j+1,2,0});
+									taking_move_exists = 1;
+								}
 							}
 						}
 						} 
+						
 						if (i+1 < columns) {
 						if (current_board[i+1][j+0] == EMPTY) { //East of location
-							//System.out.println("Piece " + i +","+ j + " has a move.");
-							//System.out.println("Found piece: " + (i+1)+ ","+(j+0));
-							//System.out.println("10 ---------");
 							list_of_moves.add(new int[]{i,j,i+1,j+0,1,0});
+							
+							if(i+2 < columns && current_board[i+2][j+0] != whose_turn && current_board[i+2][j+0] != EMPTY) { //A taking move
+								taking_moves.add(new int[]{i,j,i+1,j+0,1,0});
+								taking_move_exists = 1;
+							}
+							
 							if (i-1 >= 0){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
-								if (current_board[i-1][j+0] != EMPTY && current_board[i-1][j+0] != whose_turn)
-									list_of_moves.add(new int[]{i,j,i+1,j+0,2,0});
+								if (current_board[i-1][j+0] != EMPTY && current_board[i-1][j+0] != whose_turn) {
+									taking_moves.add(new int[]{i,j,i+1,j+0,2,0});
+									taking_move_exists = 1;
+								}
 							}
 						} 
 						}
+						
 						if (j-1 >= 0) {
 						if (current_board[i+0][j-1] == EMPTY) { //North of location
-							//System.out.println("Piece " + i +","+ j + " has a move.");
-							//System.out.println("Found piece: " + (i+0)+ ","+(j-1));
-							//System.out.println("11 ---------");
 							list_of_moves.add(new int[]{i,j,i+0,j-1,1,0});
+							
+							if(j-2 >= 0 && current_board[i+0][j-2] != whose_turn && current_board[i+0][j-2] != EMPTY) { //A taking move
+								taking_moves.add(new int[]{i,j,i+0,j-1,1,0});
+								taking_move_exists = 1;
+							}
+							
 							if (j+1 < rows){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
-								if (current_board[i+0][j+1] != EMPTY && current_board[i+0][j+1] != whose_turn)
-									list_of_moves.add(new int[]{i,j,i+0,j-1,2,0});
+								if (current_board[i+0][j+1] != EMPTY && current_board[i+0][j+1] != whose_turn) {
+									taking_moves.add(new int[]{i,j,i+0,j-1,2,0});
+									taking_move_exists = 1;
+								}
 							}
 						} 
 						}
 						if (i-1 >= 0) {
 						if (current_board[i-1][j+0] == EMPTY) { //West of location
-							//System.out.println("Piece " + i +","+ j + " has a move.");
-							//System.out.println("Found piece: " + (i-1)+ ","+(j+0));
-
-							//System.out.println("12 ---------");
 							list_of_moves.add(new int[]{i,j,i-1,j+0,1,0});
+							
+							if(i-2 >= 0 && current_board[i-2][j+0] != whose_turn && current_board[i-2][j+0] != EMPTY) { //A taking move
+								taking_moves.add(new int[]{i,j,i-1,j+0,1,0});
+								taking_move_exists = 1;
+							}
+							
 							if (i+1 < columns){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
-								if (current_board[i+1][j+0] != EMPTY && current_board[i+1][j+0] != whose_turn)
-									list_of_moves.add(new int[]{i,j,i-1,j+0,2,0});
+								if (current_board[i+1][j+0] != EMPTY && current_board[i+1][j+0] != whose_turn) {
+									taking_moves.add(new int[]{i,j,i-1,j+0,2,0});
+									taking_move_exists = 1;
+								}
 							}
 						} 
 						}
@@ -684,51 +708,69 @@ public class Board extends JPanel{
 						if((i+j)%2 == 0) { //If piece can move 8 compass directions, fill in NE SE NW SW							
 							if (i+1 < columns && j+1 < rows) {
 							if (current_board[i+1][j+1] == EMPTY) { //Southeast of location
-								//System.out.println("Piece " + i +","+ j + " has a move.");
-								//System.out.println("Found piece: " + (i+1)+ ","+(j+1));
-
-								//System.out.println("2 ---------");
 								list_of_moves.add(new int[]{i,j,i+1,j+1,1,0});
+								
+								if(j+2 < rows && i+2 < columns && current_board[i+2][j+2] != whose_turn && current_board[i+2][j+2] != EMPTY) { //A taking move
+									taking_moves.add(new int[]{i,j,i+1,j+1,1,0});
+									taking_move_exists = 1;
+								}
+								
 								if (j-1 >= 0 && i-1 >= 0){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
-									if (current_board[i-1][j-1] != EMPTY && current_board[i-1][j-1] != whose_turn)
-										list_of_moves.add(new int[]{i,j,i+1,j+1,2,0});
+									if (current_board[i-1][j-1] != EMPTY && current_board[i-1][j-1] != whose_turn) {
+										taking_moves.add(new int[]{i,j,i+1,j+1,2,0});
+										taking_move_exists = 1;
+									}
 								}
 							} 
 							}							
 							if (i+1 < columns && j-1 >= 0) {
 							if (current_board[i+1][j-1] == EMPTY) { //Northeast of location
-								//System.out.println("Piece " + i +","+ j + " has a move.");
-								//System.out.println("Found piece: " + (i+1)+ ","+(j-1));
-								//System.out.println("4 ---------");
 								list_of_moves.add(new int[]{i,j,i+1,j-1,1,0});
+								
+								if(i+2 < columns && j-2 >= 0 && current_board[i+2][j-2] != whose_turn && current_board[i+2][j-2] != EMPTY) { //A taking move
+									taking_moves.add(new int[]{i,j,i+1,j-1,1,0});
+									taking_move_exists = 1;
+								}
+								
 								if (i-1 >= 0 && j+1 < rows){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
-									if (current_board[i-1][j+1] != EMPTY && current_board[i-1][j+1] != whose_turn)
-										list_of_moves.add(new int[]{i,j,i+1,j-1,2,0});
+									if (current_board[i-1][j+1] != EMPTY && current_board[i-1][j+1] != whose_turn) {
+										taking_moves.add(new int[]{i,j,i+1,j-1,2,0});
+										taking_move_exists = 1;
+									}
 								}
 							} 
 							}							
 							if (i-1 >= 0 && j-1 >= 0) {
-							if (current_board[i-1][j-1] == EMPTY) { //Northwest of location
-								//System.out.println("Piece " + i +","+ j + " has a move.");
-								//System.out.println("Found piece: " + (i-1)+ ","+(j-1));
-								//System.out.println("6 ---------");								
+							if (current_board[i-1][j-1] == EMPTY) { //Northwest of location				
 								list_of_moves.add(new int[]{i,j,i-1,j-1,1,0});
+								
+								if(i-2 >= 0 && j-2 >= 0 && current_board[i-2][j-2] != whose_turn && current_board[i-2][j-2] != EMPTY) { //A taking move
+									taking_moves.add(new int[]{i,j,i-1,j-1,1,0});
+									taking_move_exists = 1;
+								}
+								
 								if (i+1 < columns && j+1 < rows){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
-									if (current_board[i+1][j+1] != EMPTY && current_board[i+1][j+1] != whose_turn)
-										list_of_moves.add(new int[]{i,j,i-1,j-1,2,0});
+									if (current_board[i+1][j+1] != EMPTY && current_board[i+1][j+1] != whose_turn) {
+										taking_moves.add(new int[]{i,j,i-1,j-1,2,0});
+										taking_move_exists = 1;
+									}
 								}
 							} 
 							}							
 							if (i-1 >= 0 && j+1 < rows) {
 							if (current_board[i-1][j+1] == EMPTY) { //Southwest of location
-								//System.out.println("Piece " + i +","+ j + " has a move.");
-								//System.out.println("Found piece: " + (i-1)+ ","+(j+1));
-
-								//System.out.println("8 ---------");
 								list_of_moves.add(new int[]{i,j,i-1,j+1,1,0});
+								
+								if(i-2 >= 0 &j+2 < rows && current_board[i-2][j+2] != whose_turn && current_board[i-2][j+2] != EMPTY) { //A taking move
+									taking_moves.add(new int[]{i,j,i-1,j+1,1,0});
+									taking_move_exists = 1;
+								}
+								
 								if (i+1 < columns && j-1 >= 0){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
-									if (current_board[i+1][j-1] != EMPTY && current_board[i+1][j-1] != whose_turn)
-										list_of_moves.add(new int[]{i,j,i-1,j+1,2,0});
+									if (current_board[i+1][j-1] != EMPTY && current_board[i+1][j-1] != whose_turn) {
+										taking_moves.add(new int[]{i,j,i-1,j+1,2,0});
+										taking_move_exists = 1;
+									}
 								}
 							} 
 							}
@@ -737,6 +779,17 @@ public class Board extends JPanel{
 				}
 			}
 						//-------------------FROM HERE UP WORKS FINE------------
+			if(taking_move_exists == 1) {
+				System.out.println("A TAKING MOVE EXISTS");
+				/*for(int i = 0; i<taking_moves.size(); i++) {
+					int[] current_move_ = new int[6];
+					current_move_ = taking_moves.get(i);
+					System.out.println("Taking move: old: " + current_move_[0] + "," + current_move_[1] + " new: " + current_move_[2] + "," + current_move_[3] + " dir: " + current_move_[4]);
+				}*/
+				
+				list_of_moves = taking_moves;
+			}
+			
 			for(int i = 0; i<list_of_moves.size(); i++) {
 				int[] current_move_info = new int[6];
 				current_move_info = list_of_moves.get(i);
@@ -948,11 +1001,11 @@ public class Board extends JPanel{
 			if (check_end_of_game() != 0) {
 				if (check_end_of_game() == 1) {
 					// player 1 has won the game yay
-					game_message = "Player 1 is the winner! This game lasted "+minutes+" minutes and "+seconds+" seconds";
+					game_message = "Red is the winner! This game lasted "+minutes+" minutes and "+seconds+" seconds";
 				}
 				else {
 					//player 2 won yay
-					game_message = "Player 2 has won the game! This game lasted "+minutes+" minutes and "+seconds+" seconds";
+					game_message = "Black has won the game! This game lasted "+minutes+" minutes and "+seconds+" seconds";
 				}
 				is_game_over = true;
 				repaint();
