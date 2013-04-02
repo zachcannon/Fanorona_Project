@@ -941,6 +941,10 @@ public class Board extends JPanel{
 		int seconds;
 		boolean is_game_over;
 		
+		// is it the players first time moving a piece
+		// on their turn
+		boolean is_first_move;
+		
 		long begining_of_move;
 		
 		// 0=old_x, 1=old_y, 2=new_x, 3=new_y, 4=forward or backwards(2=back, 1=forward, 0 if no take)
@@ -978,11 +982,145 @@ public class Board extends JPanel{
 			setSize(height,width);
 			setBackground(Color.white);
 			is_game_over = false;
+			is_first_move = true;
 			begining_of_move = new Date().getTime();
 			prev_locations = new ArrayList<Integer>();
 			prev_direction = -1;
 		}	
 		
+		// this function will check to see if there is a valid taking move
+		// on the board for a player
+		public boolean is_taking_move_on_board() {
+			// if it's not the players first move in their turn then
+			// this function doesn't even matter
+			if (!is_first_move) {
+				return false;
+			}
+			
+			int whose_turn = players_turn;
+			// now we check the game board array to see
+			// if the player has a valid move
+			for(int i = 0; i<columns; i++) { //Iterate through whole array
+				for(int j = 0; j<rows; j++) {
+					if(game_board_array[i][j] == whose_turn) { //Is this my piece? Yes
+						
+						//North South East and West moves
+						
+						if (j+1 < rows) {
+						if (game_board_array[i+0][j+1] == EMPTY) { //South of location
+							if(j+2 < rows && game_board_array[i+0][j+2] != whose_turn && game_board_array[i+0][j+2] != EMPTY) { //A taking move
+								return true;
+							}
+							
+							if (j-1 >= 0){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
+								if (game_board_array[i+0][j-1] != EMPTY && game_board_array[i+0][j-1] != whose_turn) {
+									return true;
+								}
+							}
+						}
+						} 
+						
+						if (i+1 < columns) {
+						if (game_board_array[i+1][j+0] == EMPTY) { //East of location
+							if(i+2 < columns && game_board_array[i+2][j+0] != whose_turn && game_board_array[i+2][j+0] != EMPTY) { //A taking move
+								return true;
+							}
+							
+							if (i-1 >= 0){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
+								if (game_board_array[i-1][j+0] != EMPTY && game_board_array[i-1][j+0] != whose_turn) {
+									return true;
+								}
+							}
+						} 
+						}
+						
+						if (j-1 >= 0) {
+						if (game_board_array[i+0][j-1] == EMPTY) { //North of location
+							if(j-2 >= 0 && game_board_array[i+0][j-2] != whose_turn && game_board_array[i+0][j-2] != EMPTY) { //A taking move
+								return true;
+							}
+							
+							if (j+1 < rows){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
+								if (game_board_array[i+0][j+1] != EMPTY && game_board_array[i+0][j+1] != whose_turn) {
+									return true;
+								}
+							}
+						} 
+						}
+						if (i-1 >= 0) {
+						if (game_board_array[i-1][j+0] == EMPTY) { //West of location
+							if(i-2 >= 0 && game_board_array[i-2][j+0] != whose_turn && game_board_array[i-2][j+0] != EMPTY) { //A taking move
+								return true;
+							}
+							
+							if (i+1 < columns){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
+								if (game_board_array[i+1][j+0] != EMPTY && game_board_array[i+1][j+0] != whose_turn) {
+									return true;
+								}
+							}
+						} 
+						}
+						
+						
+						if((i+j)%2 == 0) { //If piece can move 8 compass directions, fill in NE SE NW SW							
+							if (i+1 < columns && j+1 < rows) {
+							if (game_board_array[i+1][j+1] == EMPTY) { //Southeast of location
+								if(j+2 < rows && i+2 < columns && game_board_array[i+2][j+2] != whose_turn && game_board_array[i+2][j+2] != EMPTY) { //A taking move
+									return true;
+								}
+								
+								if (j-1 >= 0 && i-1 >= 0){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
+									if (game_board_array[i-1][j-1] != EMPTY && game_board_array[i-1][j-1] != whose_turn) {
+										return true;
+									}
+								}
+							} 
+							}							
+							if (i+1 < columns && j-1 >= 0) {
+							if (game_board_array[i+1][j-1] == EMPTY) { //Northeast of location								
+								if(i+2 < columns && j-2 >= 0 && game_board_array[i+2][j-2] != whose_turn && game_board_array[i+2][j-2] != EMPTY) { //A taking move
+									return true;
+								}
+								
+								if (i-1 >= 0 && j+1 < rows){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
+									if (game_board_array[i-1][j+1] != EMPTY && game_board_array[i-1][j+1] != whose_turn) {
+										return true;
+									}
+								}
+							} 
+							}							
+							if (i-1 >= 0 && j-1 >= 0) {
+							if (game_board_array[i-1][j-1] == EMPTY) { //Northwest of location								
+								if(i-2 >= 0 && j-2 >= 0 && game_board_array[i-2][j-2] != whose_turn && game_board_array[i-2][j-2] != EMPTY) { //A taking move
+									return true;
+								}
+								
+								if (i+1 < columns && j+1 < rows){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
+									if (game_board_array[i+1][j+1] != EMPTY && game_board_array[i+1][j+1] != whose_turn) {
+										return true;
+									}
+								}
+							} 
+							}							
+							if (i-1 >= 0 && j+1 < rows) {
+							if (game_board_array[i-1][j+1] == EMPTY) { //Southwest of location
+								if(i-2 >= 0 &j+2 < rows && game_board_array[i-2][j+2] != whose_turn && game_board_array[i-2][j+2] != EMPTY) { //A taking move
+									return true;
+								}
+								
+								if (i+1 < columns && j-1 >= 0){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
+									if (game_board_array[i+1][j-1] != EMPTY && game_board_array[i+1][j-1] != whose_turn) {
+										return true;
+									}
+								}
+							} 
+						}
+						}
+					}
+				}
+			}
+			return false;
+		}
 		
 		public void processClick(int x, int y) {
 			
@@ -1032,6 +1170,7 @@ public class Board extends JPanel{
 				}
 				begining_of_move = new Date().getTime();
 				click_counter = 0;
+				is_first_move = true;
 				repaint();
 				return;
 			}
@@ -1054,6 +1193,7 @@ public class Board extends JPanel{
 				}
 				begining_of_move = new Date().getTime();
 				click_counter = 0;
+				is_first_move = true;
 				repaint();
 				return;
 			}
@@ -1087,6 +1227,7 @@ public class Board extends JPanel{
 				prev_locations.clear();
 				prev_direction = -1;
 				click_counter = 0;
+				is_first_move = true;
 				move_counter++;
 				begining_of_move = new Date().getTime();
 				repaint();
@@ -1129,6 +1270,7 @@ public class Board extends JPanel{
 				}
 				prev_locations.clear();
 				click_counter = 0;
+				is_first_move = true;
 				move_counter++;
 				begining_of_move = new Date().getTime();
 				repaint();
@@ -1202,10 +1344,25 @@ public class Board extends JPanel{
 					return;
 				}
 				
+				// now we take a snapshot of the current board
+				// because we made need to restore it after
+				// executing the move
+				int[][] prev_board_state = new int[columns][rows];
+				for (int i=0; i<columns; i++) {
+					for (int j=0; j<rows; ++j) {
+						prev_board_state[i][j] = game_board_array[i][j];
+					}
+				}
+				
+				// check is the player had a taking move on the current board
+				// (before executing the move)
+				boolean taking_move_on_board = is_taking_move_on_board();
+				
 				// execute the move for either player 1 or player 2
 				if (players_turn == 1) {
 					if (player_1.check_valid_move(move) == 1) {
 						player_1.execute_move(move);
+						// check if the player gets an extra turn
 						if (extra_turn_flag == 1) {
 							// add location to location array
 							prev_locations.add(move[2]);
@@ -1217,21 +1374,42 @@ public class Board extends JPanel{
 							move[0] = move[2];
 							move[1] = move[3];
 							click_counter = 1;
+							is_first_move = false;
 						}
 						else {
-							prev_locations.clear();
-							prev_direction = -1;
-							players_turn = 2;
-							//check if player 2 is a CPU
-							if (player_2.get_what_i_am() == 1) {
-								game_message = "CPU Player Two's turn, click anywhere to execute it's move";
+							// if there was a taking move on board and it was the players first
+							// move in their turn (this is also checked in is_taking_move_on_board()
+							// and they chose not to take any pieces we
+							// yell at them and restore the board and tell them to start over
+							if (taking_move_on_board) {
+								// restore board
+								for (int i=0; i<columns; i++) {
+									for (int j=0; j<rows; ++j) {
+										game_board_array[i][j] = prev_board_state[i][j];
+									}
+								}
+								game_message = "Player 1 must make a taking move! Please select a piece to move";
+								click_counter = 0;
+								repaint();
+								return;
 							}
 							else {
-								game_message = "Player 2 (Red) select a piece to move";
+								// else change players
+								prev_locations.clear();
+								prev_direction = -1;
+								players_turn = 2;
+								//check if player 2 is a CPU
+								if (player_2.get_what_i_am() == 1) {
+									game_message = "CPU Player Two's turn, click anywhere to execute it's move";
+								}
+								else {
+									game_message = "Player 2 (Red) select a piece to move";
+								}
+								extra_turn_flag = 0;
+								is_first_move = true;
+								begining_of_move = new Date().getTime();
+								move_counter++;
 							}
-							extra_turn_flag = 0;
-							begining_of_move = new Date().getTime();
-							move_counter++;
 						}
 						repaint();
 						return;
@@ -1264,15 +1442,36 @@ public class Board extends JPanel{
 							move[0] = move[2];
 							move[1] = move[3];
 							click_counter = 1;
+							is_first_move = false;
 						}
 						else {
-							prev_locations.clear();
-							prev_direction = -1;
-							players_turn = 1;
-							extra_turn_flag = 0;
-							game_message = "Player 1 (Black) select a piece to move";
-							begining_of_move = new Date().getTime();
-							move_counter++;
+							// if there was a taking move on board and it was the players first
+							// move in their turn (this is also checked in is_taking_move_on_board()
+							// and they chose not to take any pieces we
+							// yell at them and restore the board and tell them to start over
+							if (taking_move_on_board) {
+								// restore board
+								for (int i=0; i<columns; i++) {
+									for (int j=0; j<rows; ++j) {
+										game_board_array[i][j] = prev_board_state[i][j];
+									}
+								}
+								game_message = "Player 2 must make a taking move! Please select a piece to move";
+								click_counter = 0;
+								repaint();
+								return;
+							}
+							else {
+								// else change players
+								prev_locations.clear();
+								prev_direction = -1;
+								players_turn = 1;
+								is_first_move = true;
+								extra_turn_flag = 0;
+								game_message = "Player 1 (Black) select a piece to move";
+								begining_of_move = new Date().getTime();
+								move_counter++;
+							}
 						}
 						repaint();
 						return;
@@ -1405,7 +1604,7 @@ public class Board extends JPanel{
 			g.drawString(minutes+":"+seconds, columns*piece_diameter*2, 20);
 			
 			// print number of moves
-			g.drawString("Move Count: "+move_counter, x_offset, 20);
+			g.drawString("Turn Count: "+move_counter, x_offset, 20);
 			
 			// draw the vertical lines
 	        g.setColor(Color.black);

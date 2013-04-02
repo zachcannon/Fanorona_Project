@@ -74,8 +74,8 @@ public class GameSelect extends JFrame {
 		// Boxes and text fields
 		txtTimeLimitms = new JTextField();
 		txtTimeLimitms.setFont(new Font("Tahoma", Font.PLAIN, 11));
-		txtTimeLimitms.setText("Time Limit (ms)");
-		txtTimeLimitms.setBounds(95, 73, 110, 20);
+		txtTimeLimitms.setText("Time Limit (ms) per turn");
+		txtTimeLimitms.setBounds(65, 73, 169, 20);
 		contentPane.add(txtTimeLimitms);
 		txtTimeLimitms.setColumns(10);
 		

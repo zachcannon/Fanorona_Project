@@ -9,6 +9,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JTextArea;
 import java.awt.GridLayout;
 import java.awt.FlowLayout;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+import java.awt.Font;
 
 public class About extends JFrame {
 
@@ -36,16 +39,35 @@ public class About extends JFrame {
 	public About() {
 		setTitle("About");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 304, 129);
+		setBounds(100, 100, 333, 150);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		JTextArea txtrThisProgramWas = new JTextArea();
-		txtrThisProgramWas.setBounds(0, 11, 288, 58);
-		txtrThisProgramWas.setText("This program was created by\r\nBlake Robertson and Zach Cannon\r\nof Team 28 in CSCE 315 Section 504");
-		contentPane.add(txtrThisProgramWas);
+		JLabel lblThisProgramWas = new JLabel("This program was created by Blake Robertson and");
+		lblThisProgramWas.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblThisProgramWas.setVerticalAlignment(SwingConstants.TOP);
+		lblThisProgramWas.setHorizontalAlignment(SwingConstants.CENTER);
+		lblThisProgramWas.setBounds(10, 11, 297, 15);
+		contentPane.add(lblThisProgramWas);
+		
+		JLabel lblNewLabel = new JLabel("Zachary Cannon of Group 28 for CSCE 315.");
+		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel.setBounds(10, 37, 297, 14);
+		contentPane.add(lblNewLabel);
+		
+		JLabel lblNewLabel_1 = new JLabel("The final version of this program was submitted");
+		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblNewLabel_1.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel_1.setBounds(10, 62, 297, 14);
+		contentPane.add(lblNewLabel_1);
+		
+		JLabel lblNewLabel_2 = new JLabel("4/2/2013");
+		lblNewLabel_2.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblNewLabel_2.setBounds(10, 87, 297, 14);
+		contentPane.add(lblNewLabel_2);
 	}
-
 }
