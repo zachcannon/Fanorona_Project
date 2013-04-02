@@ -100,7 +100,6 @@ public class GameSelect extends JFrame {
 		JButton btnHumanVsHuman = new JButton("Human vs Human");
 		btnHumanVsHuman.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//System.out.println("Human vs Human Selected\n");
 				cols = (String) colBox.getSelectedItem();
 				rows = (String) rowBox.getSelectedItem();
 				diff = (String) diffBox.getSelectedItem();
@@ -141,7 +140,6 @@ public class GameSelect extends JFrame {
 		JButton btnHumanVsCpu = new JButton("Human vs CPU");
 		btnHumanVsCpu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				//System.out.println("Human vs CPU Selected\n");
 				cols = (String) colBox.getSelectedItem();
 				rows = (String) rowBox.getSelectedItem();
 				diff = (String) diffBox.getSelectedItem();
@@ -182,7 +180,6 @@ public class GameSelect extends JFrame {
 		JButton btnCpuVsCpu = new JButton("CPU vs CPU");
 		btnCpuVsCpu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//System.out.println("CPU vs CPU Selected\n");
 				cols = (String) colBox.getSelectedItem();
 				rows = (String) rowBox.getSelectedItem();
 				diff = (String) diffBox.getSelectedItem();

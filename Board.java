@@ -501,33 +501,25 @@ public class Board extends JPanel{
 			int compass_direction; //corresponds to 1-8 for direction of move with 1=north, 2=northeast, 3=east...
 			if(old_x < new_x) { //East move		
 				if(old_y < new_y) { //South
-					System.out.println("SOUTHEAST move!!!!!!!!");
 					compass_direction = 4;
-				} else if (old_y > new_y){
-					System.out.println("NORTHEAST move!!!!!!!!");
+				} else if (old_y > new_y){ // NE move
 					compass_direction = 2;
-				} else {
-					System.out.println("EAST move!!!!!!!!");
+				} else { //E move
 					compass_direction = 3;
 				}
 			} else if (old_x > new_x) { //West move
 				if(old_y < new_y) { //NORTH
-					System.out.println("SOUTHWEST move!!!!!!!!");
-					compass_direction = 6;
+					compass_direction = 6; // SW move
 				} else if (old_y > new_y){ //South
-					System.out.println("NORTHWEST move!!!!!!!!");
-					compass_direction = 8;
+					compass_direction = 8; // NW move
 				} else {
-					System.out.println("WEST move!!!!!!!!");
-					compass_direction = 7;
+					compass_direction = 7; // W move
 				}
 			} else { //NORTH OR SOUTH
 				if(old_y < new_y) { //NORTH
-					System.out.println("SOUTH move!!!!!!!!");
-					compass_direction = 5;
+					compass_direction = 5; // South
 				} else {
-					System.out.println("NORTH move!!!!!!!!");
-					compass_direction = 1;
+					compass_direction = 1; // North
 				}
 			}
 			
@@ -780,8 +772,6 @@ public class Board extends JPanel{
 			}
 						//-------------------FROM HERE UP WORKS FINE------------
 			if(taking_move_exists == 1) {
-				System.out.println("A TAKING MOVE EXISTS  -  " + taking_moves.size());
-							
 				list_of_moves = taking_moves;
 			}
 			
@@ -793,9 +783,7 @@ public class Board extends JPanel{
 				board_holder.add(resulting_board_);
 				TEMP_PASS_COUNT++;
 				current_move_info[5] = board_state_evaluator(board_holder.get(i));
-				//System.out.println("Value of take " + i + " is " + current_move_info[5]);
 				if (current_move_info[5] > 2000 || current_move_info[5] < -2000) {
-					System.out.println("End of game condition occured.");
 					return current_move_info; //Win condition or lose condition
 				}
 				list_of_moves.set(i, current_move_info);
@@ -829,35 +817,28 @@ public class Board extends JPanel{
 			
 			
 			if (whose_turn == players_turn) {
-				System.out.println("Looking for highest");
 				int highest = -10000;
 				int place = 0;
 				for(int i = 0; i<list_of_moves.size(); i++) {
 					int[] current_move_info = list_of_moves.get(i);
-					//System.out.print(current_move_info[5]);
 					if (current_move_info[5] == 10000) return list_of_moves.get(i);
 					if(current_move_info[5] >= highest) {
 						highest = current_move_info[5];
 						place = i;
 					}
 				}
-				//System.out.println("   Returning: " + highest + "  OR   " + list_of_moves.get(place)[5]);
 				return list_of_moves.get(place);
 			} else {
-				System.out.println("Looking at lowest");
 				int lowest = 10000;
 				int place = 0;
 				for(int i = 0; i<list_of_moves.size(); i++) {
 					int[] current_move_info = list_of_moves.get(i);
-					//System.out.print(current_move_info[5]);
 					if (current_move_info[5] == -10000) return list_of_moves.get(i);
 					if(current_move_info[5] <= lowest) {
 						lowest = current_move_info[5];
 						place = i;
 					}
-				}
-				//System.out.println("   Returning: " + lowest + "  OR   " + list_of_moves.get(place)[5]);
-				
+				}				
 				return list_of_moves.get(place);
 			}			
 		}
@@ -866,19 +847,10 @@ public class Board extends JPanel{
 		public void execute_move(int[] array_of_moves) {
 			TEMP_PASS_COUNT = 0;
 
-			System.out.println("Difficulty at: " + difficulty_level);
 			int[] results_of_search = new int[5];
 			
 			results_of_search = list_possible_moves(game_board_array, this.get_who_i_am(), 1); //Looks at current gameboard, passes it computers color, and starts at tree level 1
-			//System.out.println("FINALLY RETURNED");
-			//results_of_search[0] = 5;//to be commented
-			//results_of_search[1] = 4;//to be commented
-			//results_of_search[2] = 5;//to be commented
-			//results_of_search[3] = 4;//to be commented
-			//results_of_search[4] = 0;//to be commented
-			
-			System.out.println("PASS COUNT IS AT: " + TEMP_PASS_COUNT);
-			
+									
 			int old_x = results_of_search[0];
 			int old_y = results_of_search[1];
 			int new_x = results_of_search[2];
@@ -891,43 +863,33 @@ public class Board extends JPanel{
 			int compass_direction; //corresponds to 1-8 for direction of move with 1=north, 2=northeast, 3=east...
 			if(old_x < new_x) { //East move		
 				if(old_y < new_y) { //South
-					System.out.println("SOUTHEAST move!!!!!!!!");
 					compass_direction = 4;
 				} else if (old_y > new_y){
-					System.out.println("NORTHEAST move!!!!!!!!");
 					compass_direction = 2;
 				} else {
-					System.out.println("EAST move!!!!!!!!");
 					compass_direction = 3;
 				}
 			} else if (old_x > new_x) { //West move
 				if(old_y < new_y) { //NORTH
-					System.out.println("SOUTHWEST move!!!!!!!!");
 					compass_direction = 6;
 				} else if (old_y > new_y){ //South
-					System.out.println("NORTHWEST move!!!!!!!!");
 					compass_direction = 8;
 				} else {
-					System.out.println("WEST move!!!!!!!!");
 					compass_direction = 7;
 				}
 			} else { //NORTH OR SOUTH
 				if(old_y < new_y) { //NORTH
-					System.out.println("SOUTH move!!!!!!!!");
 					compass_direction = 5;
 				} else {
-					System.out.println("NORTH move!!!!!!!!");
 					compass_direction = 1;
 				}
 			}
-			
 			erase_pieces(new_x, new_y, compass_direction, direction_to_take);	
-			
 		}
 
 	}	
 	
-	//-------------------------------GUI--------------------------------//
+	//-------------------------------GUI by Blake--------------------------------//
 		class BoardGraphics extends JPanel implements ActionListener, MouseListener {
 			int width = 950;
 			int height = 850;
@@ -1123,9 +1085,11 @@ public class Board extends JPanel{
 			
 			public void processClick(int x, int y) {
 				
+				// if the game is over or the screen is frozen, the click does nothing
 				if (is_game_over || click_counter == -1) {
 					return;
 				}
+				
 				// check move count, if we are over then the game is a draw
 				if (move_counter > (10*rows)) {
 					is_game_over = true;
@@ -1133,6 +1097,7 @@ public class Board extends JPanel{
 					repaint();
 					return;
 				}
+				
 				// if the game is over we only want to display the message
 				// and then exit the function
 				if (check_end_of_game() != 0) {
@@ -1153,8 +1118,14 @@ public class Board extends JPanel{
 				if (players_turn == 1 && player_1.get_what_i_am() == 1 && click_counter == 0) {
 					// "freeze" screen while CPU is making a move
 					click_counter = -1;
-					game_message = "CPU is processing what move to take...";
+					
+					// this message was originally going to tell the user the CPU is processing a move
+					// but it would always execute the move before repainting the board
+					// unless we had a Java exception thrown. So basically this message will be displayed
+					// when something bad happens (hopefully it won't)
+					game_message = "Something bad has happened! Please close the application.";
 					repaint();
+					
 					int[] passing = new int[4];
 					passing[0] = players_turn;
 					player_1.execute_move(passing);
@@ -1176,8 +1147,14 @@ public class Board extends JPanel{
 				if (players_turn == 2 && player_2.get_what_i_am() == 1 && click_counter == 0) {
 					// "freeze" screen while CPU is making a move
 					click_counter = -1;
-					game_message = "CPU is processing what move to take...";
+					
+					// this message was originally going to tell the user the CPU is processing a move
+					// but it would always execute the move before repainting the board
+					// unless we had a Java exception thrown. So basically this message will be displayed
+					// when something bad happens (hopefully it won't)
+					game_message = "Something bad has happened! Please close the application.";
 					repaint();
+					
 					int[] passing = new int[4];
 					passing[0] = players_turn;
 					player_2.execute_move(passing);
@@ -1277,6 +1254,7 @@ public class Board extends JPanel{
 					
 				}
 				
+				// click counter == 2 implies the user has select which direction to take
 				// if this is a direction selection click we only want to
 				// take a click inside the "buttons"
 				if (click_counter == 2) {
@@ -1317,11 +1295,12 @@ public class Board extends JPanel{
 						}
 					}
 					
-					/* bounds for buttons:
-					g.drawRect(x_offset+columns*piece_diameter*2, y_offset, 75, 25);
-		        	g.drawRect(x_offset+columns*piece_diameter*2, y_offset+piece_diameter*2, 75, 25);
-		        	g.drawRect(x_offset+columns*piece_diameter*2, y_offset+piece_diameter*4, 75, 25);
-		        	*/
+					/* Now we find out which button they clicked (forward, backward, no take)
+					 * bounds for buttons:
+					 * g.drawRect(x_offset+columns*piece_diameter*2, y_offset, 75, 25);
+		        	 * g.drawRect(x_offset+columns*piece_diameter*2, y_offset+piece_diameter*2, 75, 25);
+		        	 * g.drawRect(x_offset+columns*piece_diameter*2, y_offset+piece_diameter*4, 75, 25);
+		        	 */
 					if (x > x_offset+columns*piece_diameter*2 && x < x_offset+columns*piece_diameter*2+75
 						&& y > y_offset && y < y_offset+25) { //forward
 						move[4] = 1;
@@ -1490,12 +1469,11 @@ public class Board extends JPanel{
 					}
 				} // end of click == 2
 				
-				// otherwise we find was point was clicked on the board
-				System.out.println("X: "+x+" Y: "+y);
+				// If the user is not selecting direction or pressing a special button then
+				// we find what space on the board they clicked
 				if (x<(piece_diameter/2) || x>(piece_diameter*2*columns+piece_diameter/2)
 					|| y<(piece_diameter/2) || y>(piece_diameter*2*rows+piece_diameter/2)) {
-					System.out.println("invalid!");
-					game_message = "not valid! try again";
+					game_message = "That's not a valid point on the board! Try again.";
 					repaint();
 					return;
 				}
@@ -1503,7 +1481,6 @@ public class Board extends JPanel{
 				int row = (int)(x_with_error / (piece_diameter*2));
 				int y_with_error = y-(piece_diameter/2);
 				int col = (int)(y_with_error / (piece_diameter*2));
-				System.out.println("Row: "+row+" Col: "+col);
 				
 				// now we need to figure out where in the game we are at
 				// if it's the first click in a players move then we need
@@ -1700,7 +1677,6 @@ public class Board extends JPanel{
 			}
 
 			public void mousePressed(MouseEvent e) {
-				System.out.println("mouse pressed");
 				processClick(e.getX(), e.getY());
 			}
 			
@@ -1723,4 +1699,3 @@ public class Board extends JPanel{
 			graphics.addMouseListener(graphics);
 		}
 	}
-
