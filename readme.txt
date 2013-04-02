@@ -1,1 +1,1 @@
-Fanorona Project by Team 28 - Blake Robertson and Zachary Cannon
+Fanorona Project by Team 28 - Blake Robertson and Zachary Cannon.
