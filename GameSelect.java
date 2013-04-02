@@ -123,7 +123,7 @@ public class GameSelect extends JFrame {
 					diff_ = 2;
 				}
 				time_limit = txtTimeLimitms.getText();
-				if (time_limit.equals("Time Limit (ms)") || time_limit.equals("")) {
+				if (time_limit.equals("Time Limit (ms) per turn") || time_limit.equals("")) {
 					// default to ten minutes
 					time_limit_ = 600000;
 				}
@@ -164,7 +164,7 @@ public class GameSelect extends JFrame {
 					diff_ = 3;
 				}
 				time_limit = txtTimeLimitms.getText();
-				if (time_limit.equals("Time Limit (ms)") || time_limit.equals("")) {
+				if (time_limit.equals("Time Limit (ms) per turn") || time_limit.equals("")) {
 					// default to ten minutes
 					time_limit_ = 600000;
 				}
@@ -202,10 +202,10 @@ public class GameSelect extends JFrame {
 					diff_ = 1;
 				}
 				else {
-					diff_ = 2;
+					diff_ = 3;
 				}
 				time_limit = txtTimeLimitms.getText();
-				if (time_limit.equals("Time Limit (ms)") || time_limit.equals("")) {
+				if (time_limit.equals("Time Limit (ms) per turn") || time_limit.equals("")) {
 					// default to ten minutes
 					time_limit_ = 600000;
 				}

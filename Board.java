@@ -550,7 +550,7 @@ public class Board extends JPanel{
 			for( int i = 0; i < columns; i++ ) {
 				for (int j = 0; j < rows; j++) {
 					if (board_to_eval[i][j] == BLACK) black_pieces++;
-					else if (board_to_eval[i][j] != RED) red_pieces++;
+					else if (board_to_eval[i][j] == RED) red_pieces++;
 				}
 			}
 			if (players_turn == BLACK && black_pieces == 0) { //Loss for black
@@ -780,13 +780,8 @@ public class Board extends JPanel{
 			}
 						//-------------------FROM HERE UP WORKS FINE------------
 			if(taking_move_exists == 1) {
-				System.out.println("A TAKING MOVE EXISTS");
-				/*for(int i = 0; i<taking_moves.size(); i++) {
-					int[] current_move_ = new int[6];
-					current_move_ = taking_moves.get(i);
-					System.out.println("Taking move: old: " + current_move_[0] + "," + current_move_[1] + " new: " + current_move_[2] + "," + current_move_[3] + " dir: " + current_move_[4]);
-				}*/
-				
+				System.out.println("A TAKING MOVE EXISTS  -  " + taking_moves.size());
+							
 				list_of_moves = taking_moves;
 			}
 			
@@ -798,7 +793,11 @@ public class Board extends JPanel{
 				board_holder.add(resulting_board_);
 				TEMP_PASS_COUNT++;
 				current_move_info[5] = board_state_evaluator(board_holder.get(i));
-				if (current_move_info[5] == 10000) return current_move_info; //Win condition
+				//System.out.println("Value of take " + i + " is " + current_move_info[5]);
+				if (current_move_info[5] > 2000 || current_move_info[5] < -2000) {
+					System.out.println("End of game condition occured.");
+					return current_move_info; //Win condition or lose condition
+				}
 				list_of_moves.set(i, current_move_info);
 			}
 			
@@ -827,13 +826,15 @@ public class Board extends JPanel{
 			}
 			//Highest value passed back if players_turn = whose turn, else we want smallest move
 			
+			
+			
 			if (whose_turn == players_turn) {
 				System.out.println("Looking for highest");
 				int highest = -10000;
 				int place = 0;
 				for(int i = 0; i<list_of_moves.size(); i++) {
 					int[] current_move_info = list_of_moves.get(i);
-					System.out.print(current_move_info[5]);
+					//System.out.print(current_move_info[5]);
 					if (current_move_info[5] == 10000) return list_of_moves.get(i);
 					if(current_move_info[5] >= highest) {
 						highest = current_move_info[5];
@@ -848,7 +849,7 @@ public class Board extends JPanel{
 				int place = 0;
 				for(int i = 0; i<list_of_moves.size(); i++) {
 					int[] current_move_info = list_of_moves.get(i);
-					System.out.print(current_move_info[5]);
+					//System.out.print(current_move_info[5]);
 					if (current_move_info[5] == -10000) return list_of_moves.get(i);
 					if(current_move_info[5] <= lowest) {
 						lowest = current_move_info[5];
@@ -856,9 +857,7 @@ public class Board extends JPanel{
 					}
 				}
 				//System.out.println("   Returning: " + lowest + "  OR   " + list_of_moves.get(place)[5]);
-				if(list_of_moves.size() == 0) { //End of game.
-					
-				}
+				
 				return list_of_moves.get(place);
 			}			
 		}
@@ -871,7 +870,7 @@ public class Board extends JPanel{
 			int[] results_of_search = new int[5];
 			
 			results_of_search = list_possible_moves(game_board_array, this.get_who_i_am(), 1); //Looks at current gameboard, passes it computers color, and starts at tree level 1
-			System.out.println("FINALLY RETURNED");
+			//System.out.println("FINALLY RETURNED");
 			//results_of_search[0] = 5;//to be commented
 			//results_of_search[1] = 4;//to be commented
 			//results_of_search[2] = 5;//to be commented
@@ -929,799 +928,799 @@ public class Board extends JPanel{
 	}	
 	
 	//-------------------------------GUI--------------------------------//
-	class BoardGraphics extends JPanel implements ActionListener, MouseListener {
-		int width = 950;
-		int height = 850;
-		int piece_diameter = 30;
-		int x_offset = piece_diameter;
-		int y_offset = piece_diameter;
-		int click_counter;
-		int move_counter;
-		int minutes;
-		int seconds;
-		boolean is_game_over;
-		
-		// is it the players first time moving a piece
-		// on their turn
-		boolean is_first_move;
-		
-		long begining_of_move;
-		
-		// 0=old_x, 1=old_y, 2=new_x, 3=new_y, 4=forward or backwards(2=back, 1=forward, 0 if no take)
-		int[] move;
-		
-		// 0=flag (1 yes this player has a sacrificed piece on  the board, 0 otherwise)
-		// 1=what the move counter will need to be in order to remove the piece
-		// 2=x-cord on the board where the piece is
-		// 3=y-cord on the board where the piece is
-		int[] player_1_sac_move;
-		int[] player_2_sac_move;
-		
-		// here we will store the previous locations that a piece has been
-		// to within the same turn (cannot be at the same location twice)
-		// also we cannot move in the same direction twice
-		// 0=no prev direction, 1 = N, 2 = NE, 3 = W, 4 = SW, etc..
-		ArrayList<Integer> prev_locations;
-		int prev_direction;
-		
-		
-		public BoardGraphics() {
-			if (player_1.get_what_i_am() == 1) {
-				game_message = "Welcome to Fanorona! CPU Player One's turn, click anywhere to execute it's move";
-			}
-			else {
-				game_message = "Welcome to Fanorona! Player 1 (Black) will go first, please select a piece to move";
-			}
-			click_counter = 0;
-			move_counter = 0;
-			move = new int[5];
-			player_1_sac_move = new int[4];
-			player_2_sac_move = new int[4];
-			player_1_sac_move[0] = 0;
-			player_2_sac_move[0] = 0;
-			setSize(height,width);
-			setBackground(Color.white);
-			is_game_over = false;
-			is_first_move = true;
-			begining_of_move = new Date().getTime();
-			prev_locations = new ArrayList<Integer>();
-			prev_direction = -1;
-		}	
-		
-		// this function will check to see if there is a valid taking move
-		// on the board for a player
-		public boolean is_taking_move_on_board() {
-			// if it's not the players first move in their turn then
-			// this function doesn't even matter
-			if (!is_first_move) {
+		class BoardGraphics extends JPanel implements ActionListener, MouseListener {
+			int width = 950;
+			int height = 850;
+			int piece_diameter = 30;
+			int x_offset = piece_diameter;
+			int y_offset = piece_diameter;
+			int click_counter;
+			int move_counter;
+			int minutes;
+			int seconds;
+			boolean is_game_over;
+			
+			// is it the players first time moving a piece
+			// on their turn
+			boolean is_first_move;
+			
+			long begining_of_move;
+			
+			// 0=old_x, 1=old_y, 2=new_x, 3=new_y, 4=forward or backwards(2=back, 1=forward, 0 if no take)
+			int[] move;
+			
+			// 0=flag (1 yes this player has a sacrificed piece on  the board, 0 otherwise)
+			// 1=what the move counter will need to be in order to remove the piece
+			// 2=x-cord on the board where the piece is
+			// 3=y-cord on the board where the piece is
+			int[] player_1_sac_move;
+			int[] player_2_sac_move;
+			
+			// here we will store the previous locations that a piece has been
+			// to within the same turn (cannot be at the same location twice)
+			// also we cannot move in the same direction twice
+			// 0=no prev direction, 1 = N, 2 = NE, 3 = W, 4 = SW, etc..
+			ArrayList<Integer> prev_locations;
+			int prev_direction;
+			
+			
+			public BoardGraphics() {
+				if (player_1.get_what_i_am() == 1) {
+					game_message = "Welcome to Fanorona! CPU Player One's turn, click anywhere to execute it's move";
+				}
+				else {
+					game_message = "Welcome to Fanorona! Player 1 (Black) will go first, please select a piece to move";
+				}
+				click_counter = 0;
+				move_counter = 0;
+				move = new int[5];
+				player_1_sac_move = new int[4];
+				player_2_sac_move = new int[4];
+				player_1_sac_move[0] = 0;
+				player_2_sac_move[0] = 0;
+				setSize(height,width);
+				setBackground(Color.white);
+				is_game_over = false;
+				is_first_move = true;
+				begining_of_move = new Date().getTime();
+				prev_locations = new ArrayList<Integer>();
+				prev_direction = -1;
+			}	
+			
+			// this function will check to see if there is a valid taking move
+			// on the board for a player
+			public boolean is_taking_move_on_board() {
+				// if it's not the players first move in their turn then
+				// this function doesn't even matter
+				if (!is_first_move) {
+					return false;
+				}
+				
+				int whose_turn = players_turn;
+				// now we check the game board array to see
+				// if the player has a valid move
+				for(int i = 0; i<columns; i++) { //Iterate through whole array
+					for(int j = 0; j<rows; j++) {
+						if(game_board_array[i][j] == whose_turn) { //Is this my piece? Yes
+							
+							//North South East and West moves
+							
+							if (j+1 < rows) {
+							if (game_board_array[i+0][j+1] == EMPTY) { //South of location
+								if(j+2 < rows && game_board_array[i+0][j+2] != whose_turn && game_board_array[i+0][j+2] != EMPTY) { //A taking move
+									return true;
+								}
+								
+								if (j-1 >= 0){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
+									if (game_board_array[i+0][j-1] != EMPTY && game_board_array[i+0][j-1] != whose_turn) {
+										return true;
+									}
+								}
+							}
+							} 
+							
+							if (i+1 < columns) {
+							if (game_board_array[i+1][j+0] == EMPTY) { //East of location
+								if(i+2 < columns && game_board_array[i+2][j+0] != whose_turn && game_board_array[i+2][j+0] != EMPTY) { //A taking move
+									return true;
+								}
+								
+								if (i-1 >= 0){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
+									if (game_board_array[i-1][j+0] != EMPTY && game_board_array[i-1][j+0] != whose_turn) {
+										return true;
+									}
+								}
+							} 
+							}
+							
+							if (j-1 >= 0) {
+							if (game_board_array[i+0][j-1] == EMPTY) { //North of location
+								if(j-2 >= 0 && game_board_array[i+0][j-2] != whose_turn && game_board_array[i+0][j-2] != EMPTY) { //A taking move
+									return true;
+								}
+								
+								if (j+1 < rows){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
+									if (game_board_array[i+0][j+1] != EMPTY && game_board_array[i+0][j+1] != whose_turn) {
+										return true;
+									}
+								}
+							} 
+							}
+							if (i-1 >= 0) {
+							if (game_board_array[i-1][j+0] == EMPTY) { //West of location
+								if(i-2 >= 0 && game_board_array[i-2][j+0] != whose_turn && game_board_array[i-2][j+0] != EMPTY) { //A taking move
+									return true;
+								}
+								
+								if (i+1 < columns){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
+									if (game_board_array[i+1][j+0] != EMPTY && game_board_array[i+1][j+0] != whose_turn) {
+										return true;
+									}
+								}
+							} 
+							}
+							
+							
+							if((i+j)%2 == 0) { //If piece can move 8 compass directions, fill in NE SE NW SW							
+								if (i+1 < columns && j+1 < rows) {
+								if (game_board_array[i+1][j+1] == EMPTY) { //Southeast of location
+									if(j+2 < rows && i+2 < columns && game_board_array[i+2][j+2] != whose_turn && game_board_array[i+2][j+2] != EMPTY) { //A taking move
+										return true;
+									}
+									
+									if (j-1 >= 0 && i-1 >= 0){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
+										if (game_board_array[i-1][j-1] != EMPTY && game_board_array[i-1][j-1] != whose_turn) {
+											return true;
+										}
+									}
+								} 
+								}							
+								if (i+1 < columns && j-1 >= 0) {
+								if (game_board_array[i+1][j-1] == EMPTY) { //Northeast of location								
+									if(i+2 < columns && j-2 >= 0 && game_board_array[i+2][j-2] != whose_turn && game_board_array[i+2][j-2] != EMPTY) { //A taking move
+										return true;
+									}
+									
+									if (i-1 >= 0 && j+1 < rows){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
+										if (game_board_array[i-1][j+1] != EMPTY && game_board_array[i-1][j+1] != whose_turn) {
+											return true;
+										}
+									}
+								} 
+								}							
+								if (i-1 >= 0 && j-1 >= 0) {
+								if (game_board_array[i-1][j-1] == EMPTY) { //Northwest of location								
+									if(i-2 >= 0 && j-2 >= 0 && game_board_array[i-2][j-2] != whose_turn && game_board_array[i-2][j-2] != EMPTY) { //A taking move
+										return true;
+									}
+									
+									if (i+1 < columns && j+1 < rows){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
+										if (game_board_array[i+1][j+1] != EMPTY && game_board_array[i+1][j+1] != whose_turn) {
+											return true;
+										}
+									}
+								} 
+								}							
+								if (i-1 >= 0 && j+1 < rows) {
+								if (game_board_array[i-1][j+1] == EMPTY) { //Southwest of location
+									if(i-2 >= 0 &j+2 < rows && game_board_array[i-2][j+2] != whose_turn && game_board_array[i-2][j+2] != EMPTY) { //A taking move
+										return true;
+									}
+									
+									if (i+1 < columns && j-1 >= 0){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
+										if (game_board_array[i+1][j-1] != EMPTY && game_board_array[i+1][j-1] != whose_turn) {
+											return true;
+										}
+									}
+								} 
+							}
+							}
+						}
+					}
+				}
 				return false;
 			}
 			
-			int whose_turn = players_turn;
-			// now we check the game board array to see
-			// if the player has a valid move
-			for(int i = 0; i<columns; i++) { //Iterate through whole array
-				for(int j = 0; j<rows; j++) {
-					if(game_board_array[i][j] == whose_turn) { //Is this my piece? Yes
-						
-						//North South East and West moves
-						
-						if (j+1 < rows) {
-						if (game_board_array[i+0][j+1] == EMPTY) { //South of location
-							if(j+2 < rows && game_board_array[i+0][j+2] != whose_turn && game_board_array[i+0][j+2] != EMPTY) { //A taking move
-								return true;
-							}
-							
-							if (j-1 >= 0){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
-								if (game_board_array[i+0][j-1] != EMPTY && game_board_array[i+0][j-1] != whose_turn) {
-									return true;
-								}
-							}
-						}
-						} 
-						
-						if (i+1 < columns) {
-						if (game_board_array[i+1][j+0] == EMPTY) { //East of location
-							if(i+2 < columns && game_board_array[i+2][j+0] != whose_turn && game_board_array[i+2][j+0] != EMPTY) { //A taking move
-								return true;
-							}
-							
-							if (i-1 >= 0){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
-								if (game_board_array[i-1][j+0] != EMPTY && game_board_array[i-1][j+0] != whose_turn) {
-									return true;
-								}
-							}
-						} 
-						}
-						
-						if (j-1 >= 0) {
-						if (game_board_array[i+0][j-1] == EMPTY) { //North of location
-							if(j-2 >= 0 && game_board_array[i+0][j-2] != whose_turn && game_board_array[i+0][j-2] != EMPTY) { //A taking move
-								return true;
-							}
-							
-							if (j+1 < rows){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
-								if (game_board_array[i+0][j+1] != EMPTY && game_board_array[i+0][j+1] != whose_turn) {
-									return true;
-								}
-							}
-						} 
-						}
-						if (i-1 >= 0) {
-						if (game_board_array[i-1][j+0] == EMPTY) { //West of location
-							if(i-2 >= 0 && game_board_array[i-2][j+0] != whose_turn && game_board_array[i-2][j+0] != EMPTY) { //A taking move
-								return true;
-							}
-							
-							if (i+1 < columns){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
-								if (game_board_array[i+1][j+0] != EMPTY && game_board_array[i+1][j+0] != whose_turn) {
-									return true;
-								}
-							}
-						} 
-						}
-						
-						
-						if((i+j)%2 == 0) { //If piece can move 8 compass directions, fill in NE SE NW SW							
-							if (i+1 < columns && j+1 < rows) {
-							if (game_board_array[i+1][j+1] == EMPTY) { //Southeast of location
-								if(j+2 < rows && i+2 < columns && game_board_array[i+2][j+2] != whose_turn && game_board_array[i+2][j+2] != EMPTY) { //A taking move
-									return true;
-								}
-								
-								if (j-1 >= 0 && i-1 >= 0){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
-									if (game_board_array[i-1][j-1] != EMPTY && game_board_array[i-1][j-1] != whose_turn) {
-										return true;
-									}
-								}
-							} 
-							}							
-							if (i+1 < columns && j-1 >= 0) {
-							if (game_board_array[i+1][j-1] == EMPTY) { //Northeast of location								
-								if(i+2 < columns && j-2 >= 0 && game_board_array[i+2][j-2] != whose_turn && game_board_array[i+2][j-2] != EMPTY) { //A taking move
-									return true;
-								}
-								
-								if (i-1 >= 0 && j+1 < rows){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
-									if (game_board_array[i-1][j+1] != EMPTY && game_board_array[i-1][j+1] != whose_turn) {
-										return true;
-									}
-								}
-							} 
-							}							
-							if (i-1 >= 0 && j-1 >= 0) {
-							if (game_board_array[i-1][j-1] == EMPTY) { //Northwest of location								
-								if(i-2 >= 0 && j-2 >= 0 && game_board_array[i-2][j-2] != whose_turn && game_board_array[i-2][j-2] != EMPTY) { //A taking move
-									return true;
-								}
-								
-								if (i+1 < columns && j+1 < rows){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
-									if (game_board_array[i+1][j+1] != EMPTY && game_board_array[i+1][j+1] != whose_turn) {
-										return true;
-									}
-								}
-							} 
-							}							
-							if (i-1 >= 0 && j+1 < rows) {
-							if (game_board_array[i-1][j+1] == EMPTY) { //Southwest of location
-								if(i-2 >= 0 &j+2 < rows && game_board_array[i-2][j+2] != whose_turn && game_board_array[i-2][j+2] != EMPTY) { //A taking move
-									return true;
-								}
-								
-								if (i+1 < columns && j-1 >= 0){ //Checks if a back take will even take a piece. If not, then it is not necessary to add
-									if (game_board_array[i+1][j-1] != EMPTY && game_board_array[i+1][j-1] != whose_turn) {
-										return true;
-									}
-								}
-							} 
-						}
-						}
-					}
-				}
-			}
-			return false;
-		}
-		
-		public void processClick(int x, int y) {
-			
-			if (is_game_over || click_counter == -1) {
-				return;
-			}
-			// check move count, if we are over then the game is a draw
-			if (move_counter > (10*rows)) {
-				is_game_over = true;
-				game_message = "Reached max number of moves, the game is a draw!";
-				repaint();
-				return;
-			}
-			// if the game is over we only want to display the message
-			// and then exit the function
-			if (check_end_of_game() != 0) {
-				if (check_end_of_game() == 1) {
-					// player 1 has won the game yay
-					game_message = "Red is the winner! This game lasted "+minutes+" minutes and "+seconds+" seconds";
-				}
-				else {
-					//player 2 won yay
-					game_message = "Black has won the game! This game lasted "+minutes+" minutes and "+seconds+" seconds";
-				}
-				is_game_over = true;
-				repaint();
-				return;
-			}
-			
-			// if its a CPU's turn we need to execute its move
-			if (players_turn == 1 && player_1.get_what_i_am() == 1 && click_counter == 0) {
-				// "freeze" screen while CPU is making a move
-				click_counter = -1;
-				game_message = "CPU is processing what move to take...";
-				repaint();
-				int[] passing = new int[4];
-				passing[0] = players_turn;
-				player_1.execute_move(passing);
-				move_counter++;
-				extra_turn_flag = 0;
-				players_turn = 2;
-				if (player_2.get_what_i_am() == 1) {
-					game_message = "CPU Player Two's turn, click anywhere to execute it's move";
-				}
-				else {
-					game_message = "Player 2 (Red) please select a piece to move";
-				}
-				begining_of_move = new Date().getTime();
-				click_counter = 0;
-				is_first_move = true;
-				repaint();
-				return;
-			}
-			if (players_turn == 2 && player_2.get_what_i_am() == 1 && click_counter == 0) {
-				// "freeze" screen while CPU is making a move
-				click_counter = -1;
-				game_message = "CPU is processing what move to take...";
-				repaint();
-				int[] passing = new int[4];
-				passing[0] = players_turn;
-				player_2.execute_move(passing);
-				move_counter++;
-				extra_turn_flag = 0;
-				players_turn = 1;
-				if (player_1.get_what_i_am() == 1) {
-					game_message = "CPU Player One's turn, click anywhere to execute it's move";
-				}
-				else {
-					game_message = "Player 1 (Black) please select a piece to move";
-				}
-				begining_of_move = new Date().getTime();
-				click_counter = 0;
-				is_first_move = true;
-				repaint();
-				return;
-			}
-			
-			
-			// if they click the pass button change players
-			// bounds off pass button: (x_offset+columns*piece_diameter*2, (rows*piece_diameter), 75, 25)
-			if (click_counter == 1 && extra_turn_flag == 1 &&
-				x > x_offset+columns*piece_diameter*2 && x < x_offset+columns*piece_diameter*2+75
-				&& y > rows*piece_diameter && y < rows*piece_diameter+25) {
-				if (players_turn == 1) {
-					players_turn = 2;
-					extra_turn_flag = 0;
-					if (player_2.get_what_i_am() == 1) {
-						game_message = "CPU Player Two's turn, click anywhere to execute it's move";
-					}
-					else {
-						game_message = "Player 2 (Red) select a piece to move";
-					}
-				}
-				else {
-					players_turn = 1;
-					extra_turn_flag = 0;
-					if (player_2.get_what_i_am() == 1) {
-						game_message = "CPU Player One's turn, click anywhere to execute it's move";
-					}
-					else {
-						game_message = "Player 1 (Black) select a piece to move";
-					}
-				}
-				prev_locations.clear();
-				prev_direction = -1;
-				click_counter = 0;
-				is_first_move = true;
-				move_counter++;
-				begining_of_move = new Date().getTime();
-				repaint();
-				return;
-			}
-			
-			// if the sacrifice button is pressed we want to sacrifice the selected piece
-			// button bounds: x_offset+columns*piece_diameter*2, (rows*piece_diameter+piece_diameter*2), 75, 25
-			if (click_counter ==  1 && extra_turn_flag == 0
-					&& x > x_offset+columns*piece_diameter*2 && x < x_offset+columns*piece_diameter*2+75
-					&& y > rows*piece_diameter && y < rows*piece_diameter+25) {
-				game_board_array[move[0]][move[1]] = SACRIFICED;
-				if (players_turn == 1) {
-					player_1_sac_move[0] = 1;
-					player_1_sac_move[1] = move_counter+2;
-					player_1_sac_move[2] = move[0];
-					player_1_sac_move[3] = move[1];
-					players_turn = 2;
-					extra_turn_flag = 0;
-					if (player_2.get_what_i_am() == 1) {
-						game_message = "CPU Player Two's turn, click anywhere to execute it's move";
-					}
-					else {
-						game_message = "Player 2 (Red) select a piece to move";
-					}
-				}
-				else {
-					player_2_sac_move[0] = 1;
-					player_2_sac_move[1] = move_counter+2;
-					player_2_sac_move[2] = move[0];
-					player_2_sac_move[3] = move[1];
-					players_turn = 1;
-					extra_turn_flag = 0;
-					if (player_2.get_what_i_am() == 1) {
-						game_message = "CPU Player One's turn, click anywhere to execute it's move";
-					}
-					else {
-						game_message = "Player 1 (Black) select a piece to move";
-					}
-				}
-				prev_locations.clear();
-				click_counter = 0;
-				is_first_move = true;
-				move_counter++;
-				begining_of_move = new Date().getTime();
-				repaint();
-				return;
+			public void processClick(int x, int y) {
 				
-			}
-			
-			// if this is a direction selection click we only want to
-			// take a click inside the "buttons"
-			if (click_counter == 2) {
-				// first lets make sure they haven't gone over the time limit
-				if ((new Date().getTime() - begining_of_move ) > turn_time_limit) {
-					if (players_turn == 1) {
-						game_message = "Player One's turn took too much time! Player 2 Wins!";
+				if (is_game_over || click_counter == -1) {
+					return;
+				}
+				// check move count, if we are over then the game is a draw
+				if (move_counter > (10*rows)) {
+					is_game_over = true;
+					game_message = "Reached max number of moves, the game is a draw!";
+					repaint();
+					return;
+				}
+				// if the game is over we only want to display the message
+				// and then exit the function
+				if (check_end_of_game() != 0) {
+					if (check_end_of_game() == 1) {
+						// player 1 has won the game yay
+						game_message = "Red is the winner! This game lasted "+minutes+" minutes and "+seconds+" seconds";
 					}
 					else {
-						game_message = "Player Two's turn took too much time! Player 1 Wins!";
+						//player 2 won yay
+						game_message = "Black has won the game! This game lasted "+minutes+" minutes and "+seconds+" seconds";
 					}
 					is_game_over = true;
 					repaint();
 					return;
 				}
 				
-				// next lets make sure the player is not trying to move in the same direction if
-				// they took pieces previously
-				if ((get_direction(move[0], move[1], move[2], move[3]) == prev_direction)
-						|| (get_direction(move[0], move[1], move[2], move[3]) == prev_direction%4)
-						|| (get_direction(move[0], move[1], move[2], move[3]) == 0 && prev_direction == 4)
-						|| (get_direction(move[0], move[1], move[2], move[3]) == 4 && prev_direction == 0)) {
-					game_message = "You cannot move in the same direction! Please select a different direction or pass";
-					click_counter = 1;
+				// if its a CPU's turn we need to execute its move
+				if (players_turn == 1 && player_1.get_what_i_am() == 1 && click_counter == 0) {
+					// "freeze" screen while CPU is making a move
+					click_counter = -1;
+					game_message = "CPU is processing what move to take...";
+					repaint();
+					int[] passing = new int[4];
+					passing[0] = players_turn;
+					player_1.execute_move(passing);
+					move_counter++;
+					extra_turn_flag = 0;
+					players_turn = 2;
+					if (player_2.get_what_i_am() == 1) {
+						game_message = "CPU Player Two's turn, click anywhere to execute it's move";
+					}
+					else {
+						game_message = "Player 2 (Red) please select a piece to move";
+					}
+					begining_of_move = new Date().getTime();
+					click_counter = 0;
+					is_first_move = true;
+					repaint();
+					return;
+				}
+				if (players_turn == 2 && player_2.get_what_i_am() == 1 && click_counter == 0) {
+					// "freeze" screen while CPU is making a move
+					click_counter = -1;
+					game_message = "CPU is processing what move to take...";
+					repaint();
+					int[] passing = new int[4];
+					passing[0] = players_turn;
+					player_2.execute_move(passing);
+					move_counter++;
+					extra_turn_flag = 0;
+					players_turn = 1;
+					if (player_1.get_what_i_am() == 1) {
+						game_message = "CPU Player One's turn, click anywhere to execute it's move";
+					}
+					else {
+						game_message = "Player 1 (Black) please select a piece to move";
+					}
+					begining_of_move = new Date().getTime();
+					click_counter = 0;
+					is_first_move = true;
 					repaint();
 					return;
 				}
 				
-				// we also need to make sure they are not visiting a spot previously visited
-				for (int i=0; i<prev_locations.size()-1; ++i) {
-					if (i%2 == 0 && move[2] == prev_locations.get(i)) {
-						if (move[3] == prev_locations.get(i+1)) {
-							game_message = "You've already visited ("+move[2]+","+move[3]+")! Please select another location to move to";
-							click_counter = 1;
-							repaint();
-							return;
-						}
-					}
-				}
 				
-				/* bounds for buttons:
-				g.drawRect(x_offset+columns*piece_diameter*2, y_offset, 75, 25);
-	        	g.drawRect(x_offset+columns*piece_diameter*2, y_offset+piece_diameter*2, 75, 25);
-	        	g.drawRect(x_offset+columns*piece_diameter*2, y_offset+piece_diameter*4, 75, 25);
-	        	*/
-				if (x > x_offset+columns*piece_diameter*2 && x < x_offset+columns*piece_diameter*2+75
-					&& y > y_offset && y < y_offset+25) { //forward
-					move[4] = 1;
-					click_counter = 0;
-				}
-				else if (x > x_offset+columns*piece_diameter*2 && x < x_offset+columns*piece_diameter*2+75
-						&& y > y_offset+piece_diameter*2 && y < y_offset+piece_diameter*2+25) { // backwards
-					move[4] = 2;
-					click_counter = 0;
-				}
-				else if (x > x_offset+columns*piece_diameter*2 && x < x_offset+columns*piece_diameter*2+75
-						&& y > y_offset+piece_diameter*4 && y < y_offset+piece_diameter*4+25) { // no take
-					move[4] = 0;
-					click_counter = 0;
-				}
-				else {
-					game_message = "Please select a direction to take.";
-					repaint();
-					return;
-				}
-				
-				// now we take a snapshot of the current board
-				// because we made need to restore it after
-				// executing the move
-				int[][] prev_board_state = new int[columns][rows];
-				for (int i=0; i<columns; i++) {
-					for (int j=0; j<rows; ++j) {
-						prev_board_state[i][j] = game_board_array[i][j];
-					}
-				}
-				
-				// check is the player had a taking move on the current board
-				// (before executing the move)
-				boolean taking_move_on_board = is_taking_move_on_board();
-				
-				// execute the move for either player 1 or player 2
-				if (players_turn == 1) {
-					if (player_1.check_valid_move(move) == 1) {
-						player_1.execute_move(move);
-						// check if the player gets an extra turn
-						if (extra_turn_flag == 1) {
-							// add location to location array
-							prev_locations.add(move[2]);
-							prev_locations.add(move[3]);
-							// set previous direction
-							prev_direction = get_direction(move[0], move[1], move[2], move[3]);
-							// the player took some pieces they get to go again
-							game_message = "Player 1 (Black) select where to move ("+move[0]+","+move[1]+") or pass";
-							move[0] = move[2];
-							move[1] = move[3];
-							click_counter = 1;
-							is_first_move = false;
-						}
-						else {
-							// if there was a taking move on board and it was the players first
-							// move in their turn (this is also checked in is_taking_move_on_board()
-							// and they chose not to take any pieces we
-							// yell at them and restore the board and tell them to start over
-							if (taking_move_on_board) {
-								// restore board
-								for (int i=0; i<columns; i++) {
-									for (int j=0; j<rows; ++j) {
-										game_board_array[i][j] = prev_board_state[i][j];
-									}
-								}
-								game_message = "Player 1 must make a taking move! Please select a piece to move";
-								click_counter = 0;
-								repaint();
-								return;
-							}
-							else {
-								// else change players
-								prev_locations.clear();
-								prev_direction = -1;
-								players_turn = 2;
-								//check if player 2 is a CPU
-								if (player_2.get_what_i_am() == 1) {
-									game_message = "CPU Player Two's turn, click anywhere to execute it's move";
-								}
-								else {
-									game_message = "Player 2 (Red) select a piece to move";
-								}
-								extra_turn_flag = 0;
-								is_first_move = true;
-								begining_of_move = new Date().getTime();
-								move_counter++;
-							}
-						}
-						repaint();
-						return;
-					}
-					else {
-						if (extra_turn_flag == 1) {
-							// the player took some pieces but then made invalid move
-							game_message = "Invalid move! Player 1 (Black) select where to move ("+move[0]+","+move[1]+") or pass";
-							click_counter = 1;
-						}
-						else {
-							game_message = "That is not a valid move! Player 1 (Black) select a peice to move";
-						}
-						repaint();
-						return;
-					}
-				}
-				else {
-					if (player_2.check_valid_move(move) == 1) {
-						player_2.execute_move(move);
-						// else its player one's turn
-						if (extra_turn_flag == 1) {
-							// add location to location array
-							prev_locations.add(move[2]);
-							prev_locations.add(move[3]);
-							//set previous direction
-							prev_direction = get_direction(move[0], move[1], move[2], move[3]);
-							// the player took some pieces they get to go again
-							game_message = "Player 2 (Red) select where to move ("+move[2]+","+move[3]+") or pass";
-							move[0] = move[2];
-							move[1] = move[3];
-							click_counter = 1;
-							is_first_move = false;
-						}
-						else {
-							// if there was a taking move on board and it was the players first
-							// move in their turn (this is also checked in is_taking_move_on_board()
-							// and they chose not to take any pieces we
-							// yell at them and restore the board and tell them to start over
-							if (taking_move_on_board) {
-								// restore board
-								for (int i=0; i<columns; i++) {
-									for (int j=0; j<rows; ++j) {
-										game_board_array[i][j] = prev_board_state[i][j];
-									}
-								}
-								game_message = "Player 2 must make a taking move! Please select a piece to move";
-								click_counter = 0;
-								repaint();
-								return;
-							}
-							else {
-								// else change players
-								prev_locations.clear();
-								prev_direction = -1;
-								players_turn = 1;
-								is_first_move = true;
-								extra_turn_flag = 0;
-								game_message = "Player 1 (Black) select a piece to move";
-								begining_of_move = new Date().getTime();
-								move_counter++;
-							}
-						}
-						repaint();
-						return;
-					}
-					else {
-						if (extra_turn_flag == 1) {
-							// the player took some pieces but then made invalid move
-							game_message = "Invalid move! Player 2 (Red) select where to move ("+move[0]+","+move[1]+") or pass";
-							click_counter = 1;
-						}
-						else {
-							game_message = "That is not a valid move! Player 2 (red) select a peice to move";
-						}
-						repaint();
-						return;
-					}
-				}
-			} // end of click == 2
-			
-			// otherwise we find was point was clicked on the board
-			System.out.println("X: "+x+" Y: "+y);
-			if (x<(piece_diameter/2) || x>(piece_diameter*2*columns+piece_diameter/2)
-				|| y<(piece_diameter/2) || y>(piece_diameter*2*rows+piece_diameter/2)) {
-				System.out.println("invalid!");
-				game_message = "not valid! try again";
-				repaint();
-				return;
-			}
-			int x_with_error = x-(piece_diameter/2);
-			int row = (int)(x_with_error / (piece_diameter*2));
-			int y_with_error = y-(piece_diameter/2);
-			int col = (int)(y_with_error / (piece_diameter*2));
-			System.out.println("Row: "+row+" Col: "+col);
-			
-			// now we need to figure out where in the game we are at
-			// if it's the first click in a players move then we need
-			// to store "old x" and "old y" in move array
-			if (click_counter == 0) {
-				// some error checking first
-				if ((players_turn == 1 && game_board_array[row][col] == BLACK)
-					|| (players_turn == 2 && game_board_array[row][col] == RED)) {
-					move[0] = row;
-					move[1] = col;
-					prev_locations.add(move[0]);
-					prev_locations.add(move[1]);
-					click_counter++;
-					game_message = "You have selected to move ("+row+","+col+"), please select where to move. Click this piece again to select another piece to move";
-					repaint();
-				}
-				// if it doesn't meet the requirement then we can let them try again
-				// without updating the counter
-				else {
-					game_message = "("+row+","+col+") is a not valid peice for you!";
-					repaint();
-				}
-			}
-			// is this is click number two, this is where they want to move
-			// so we store "new x" and "new y"
-			else if (click_counter == 1) {
-				// if the user clicks the same piece we want to start over (unless they just took pieces)
-				if (row == move[0] && col == move[1] && extra_turn_flag == 0) {
-					click_counter = 0;
+				// if they click the pass button change players
+				// bounds off pass button: (x_offset+columns*piece_diameter*2, (rows*piece_diameter), 75, 25)
+				if (click_counter == 1 && extra_turn_flag == 1 &&
+					x > x_offset+columns*piece_diameter*2 && x < x_offset+columns*piece_diameter*2+75
+					&& y > rows*piece_diameter && y < rows*piece_diameter+25) {
 					if (players_turn == 1) {
-						game_message = "Player 1 (Black) Select a piece to move";
-						repaint();
-						return;
-					}
-					else {
-						game_message = "Player 2 (Red) Select a piece to move";
-						repaint();
-						return;
-					}
-				}
-				// basic error checking
-				if (game_board_array[row][col] == EMPTY) {
-					// complicated error checking
-					// if the point we are sums up to be odd we can only move N, S, E, W
-					// for example (0, 1) would be only be able to move N, W, E, W
-					// since 0+1 = 1 and 1 is odd
-					if ((move[0]+move[1])%2 == 1) {
-						//since we can only move in the same col or row
-						//if BOTH row and col change then its an invalid move
-						if (move[0] != row && move[1] != col) {
-							game_message = "No line to move along, please select a valid empty spot to move ("+move[0]+","+move[1]+")";
-							repaint();
-							return;
+						players_turn = 2;
+						extra_turn_flag = 0;
+						if (player_2.get_what_i_am() == 1) {
+							game_message = "CPU Player Two's turn, click anywhere to execute it's move";
+						}
+						else {
+							game_message = "Player 2 (Red) select a piece to move";
 						}
 					}
-					move[2] = row;
-					move[3] = col;
-					click_counter++;
-					// we need to update the game_message and let the user select a direction
-					game_message = "moving ("+move[0]+","+move[1]+") to ("+row+","+col+") Please select a direction to take.";
+					else {
+						players_turn = 1;
+						extra_turn_flag = 0;
+						if (player_2.get_what_i_am() == 1) {
+							game_message = "CPU Player One's turn, click anywhere to execute it's move";
+						}
+						else {
+							game_message = "Player 1 (Black) select a piece to move";
+						}
+					}
+					prev_locations.clear();
+					prev_direction = -1;
+					click_counter = 0;
+					is_first_move = true;
+					move_counter++;
+					begining_of_move = new Date().getTime();
 					repaint();
+					return;
+				}
+				
+				// if the sacrifice button is pressed we want to sacrifice the selected piece
+				// button bounds: x_offset+columns*piece_diameter*2, (rows*piece_diameter+piece_diameter*2), 75, 25
+				if (click_counter ==  1 && extra_turn_flag == 0
+						&& x > x_offset+columns*piece_diameter*2 && x < x_offset+columns*piece_diameter*2+75
+						&& y > rows*piece_diameter && y < rows*piece_diameter+25) {
+					game_board_array[move[0]][move[1]] = SACRIFICED;
+					if (players_turn == 1) {
+						player_1_sac_move[0] = 1;
+						player_1_sac_move[1] = move_counter+2;
+						player_1_sac_move[2] = move[0];
+						player_1_sac_move[3] = move[1];
+						players_turn = 2;
+						extra_turn_flag = 0;
+						if (player_2.get_what_i_am() == 1) {
+							game_message = "CPU Player Two's turn, click anywhere to execute it's move";
+						}
+						else {
+							game_message = "Player 2 (Red) select a piece to move";
+						}
+					}
+					else {
+						player_2_sac_move[0] = 1;
+						player_2_sac_move[1] = move_counter+2;
+						player_2_sac_move[2] = move[0];
+						player_2_sac_move[3] = move[1];
+						players_turn = 1;
+						extra_turn_flag = 0;
+						if (player_2.get_what_i_am() == 1) {
+							game_message = "CPU Player One's turn, click anywhere to execute it's move";
+						}
+						else {
+							game_message = "Player 1 (Black) select a piece to move";
+						}
+					}
+					prev_locations.clear();
+					click_counter = 0;
+					is_first_move = true;
+					move_counter++;
+					begining_of_move = new Date().getTime();
+					repaint();
+					return;
 					
 				}
-				// else its not a valid move
-				else {
-					game_message = "("+row+","+col+") is not empty!, select an empty place";
+				
+				// if this is a direction selection click we only want to
+				// take a click inside the "buttons"
+				if (click_counter == 2) {
+					// first lets make sure they haven't gone over the time limit
+					if ((new Date().getTime() - begining_of_move ) > turn_time_limit) {
+						if (players_turn == 1) {
+							game_message = "Player One's turn took too much time! Player 2 Wins!";
+						}
+						else {
+							game_message = "Player Two's turn took too much time! Player 1 Wins!";
+						}
+						is_game_over = true;
+						repaint();
+						return;
+					}
+					
+					// next lets make sure the player is not trying to move in the same direction if
+					// they took pieces previously
+					if ((get_direction(move[0], move[1], move[2], move[3]) == prev_direction)
+							|| (get_direction(move[0], move[1], move[2], move[3]) == prev_direction%4)
+							|| (get_direction(move[0], move[1], move[2], move[3]) == 0 && prev_direction == 4)
+							|| (get_direction(move[0], move[1], move[2], move[3]) == 4 && prev_direction == 0)) {
+						game_message = "You cannot move in the same direction! Please select a different direction or pass";
+						click_counter = 1;
+						repaint();
+						return;
+					}
+					
+					// we also need to make sure they are not visiting a spot previously visited
+					for (int i=0; i<prev_locations.size()-1; ++i) {
+						if (i%2 == 0 && move[2] == prev_locations.get(i)) {
+							if (move[3] == prev_locations.get(i+1)) {
+								game_message = "You've already visited ("+move[2]+","+move[3]+")! Please select another location to move to";
+								click_counter = 1;
+								repaint();
+								return;
+							}
+						}
+					}
+					
+					/* bounds for buttons:
+					g.drawRect(x_offset+columns*piece_diameter*2, y_offset, 75, 25);
+		        	g.drawRect(x_offset+columns*piece_diameter*2, y_offset+piece_diameter*2, 75, 25);
+		        	g.drawRect(x_offset+columns*piece_diameter*2, y_offset+piece_diameter*4, 75, 25);
+		        	*/
+					if (x > x_offset+columns*piece_diameter*2 && x < x_offset+columns*piece_diameter*2+75
+						&& y > y_offset && y < y_offset+25) { //forward
+						move[4] = 1;
+						click_counter = 0;
+					}
+					else if (x > x_offset+columns*piece_diameter*2 && x < x_offset+columns*piece_diameter*2+75
+							&& y > y_offset+piece_diameter*2 && y < y_offset+piece_diameter*2+25) { // backwards
+						move[4] = 2;
+						click_counter = 0;
+					}
+					else if (x > x_offset+columns*piece_diameter*2 && x < x_offset+columns*piece_diameter*2+75
+							&& y > y_offset+piece_diameter*4 && y < y_offset+piece_diameter*4+25) { // no take
+						move[4] = 0;
+						click_counter = 0;
+					}
+					else {
+						game_message = "Please select a direction to take.";
+						repaint();
+						return;
+					}
+					
+					// now we take a snapshot of the current board
+					// because we made need to restore it after
+					// executing the move
+					int[][] prev_board_state = new int[columns][rows];
+					for (int i=0; i<columns; i++) {
+						for (int j=0; j<rows; ++j) {
+							prev_board_state[i][j] = game_board_array[i][j];
+						}
+					}
+					
+					// check is the player had a taking move on the current board
+					// (before executing the move)
+					boolean taking_move_on_board = is_taking_move_on_board();
+					
+					// execute the move for either player 1 or player 2
+					if (players_turn == 1) {
+						if (player_1.check_valid_move(move) == 1) {
+							player_1.execute_move(move);
+							// check if the player gets an extra turn
+							if (extra_turn_flag == 1) {
+								// add location to location array
+								prev_locations.add(move[2]);
+								prev_locations.add(move[3]);
+								// set previous direction
+								prev_direction = get_direction(move[0], move[1], move[2], move[3]);
+								// the player took some pieces they get to go again
+								game_message = "Player 1 (Black) select where to move ("+move[0]+","+move[1]+") or pass";
+								move[0] = move[2];
+								move[1] = move[3];
+								click_counter = 1;
+								is_first_move = false;
+							}
+							else {
+								// if there was a taking move on board and it was the players first
+								// move in their turn (this is also checked in is_taking_move_on_board()
+								// and they chose not to take any pieces we
+								// yell at them and restore the board and tell them to start over
+								if (taking_move_on_board) {
+									// restore board
+									for (int i=0; i<columns; i++) {
+										for (int j=0; j<rows; ++j) {
+											game_board_array[i][j] = prev_board_state[i][j];
+										}
+									}
+									game_message = "Player 1 must make a taking move! Please select a piece to move";
+									click_counter = 0;
+									repaint();
+									return;
+								}
+								else {
+									// else change players
+									prev_locations.clear();
+									prev_direction = -1;
+									players_turn = 2;
+									//check if player 2 is a CPU
+									if (player_2.get_what_i_am() == 1) {
+										game_message = "CPU Player Two's turn, click anywhere to execute it's move";
+									}
+									else {
+										game_message = "Player 2 (Red) select a piece to move";
+									}
+									extra_turn_flag = 0;
+									is_first_move = true;
+									begining_of_move = new Date().getTime();
+									move_counter++;
+								}
+							}
+							repaint();
+							return;
+						}
+						else {
+							if (extra_turn_flag == 1) {
+								// the player took some pieces but then made invalid move
+								game_message = "Invalid move! Player 1 (Black) select where to move ("+move[0]+","+move[1]+") or pass";
+								click_counter = 1;
+							}
+							else {
+								game_message = "That is not a valid move! Player 1 (Black) select a peice to move";
+							}
+							repaint();
+							return;
+						}
+					}
+					else {
+						if (player_2.check_valid_move(move) == 1) {
+							player_2.execute_move(move);
+							// else its player one's turn
+							if (extra_turn_flag == 1) {
+								// add location to location array
+								prev_locations.add(move[2]);
+								prev_locations.add(move[3]);
+								//set previous direction
+								prev_direction = get_direction(move[0], move[1], move[2], move[3]);
+								// the player took some pieces they get to go again
+								game_message = "Player 2 (Red) select where to move ("+move[2]+","+move[3]+") or pass";
+								move[0] = move[2];
+								move[1] = move[3];
+								click_counter = 1;
+								is_first_move = false;
+							}
+							else {
+								// if there was a taking move on board and it was the players first
+								// move in their turn (this is also checked in is_taking_move_on_board()
+								// and they chose not to take any pieces we
+								// yell at them and restore the board and tell them to start over
+								if (taking_move_on_board) {
+									// restore board
+									for (int i=0; i<columns; i++) {
+										for (int j=0; j<rows; ++j) {
+											game_board_array[i][j] = prev_board_state[i][j];
+										}
+									}
+									game_message = "Player 2 must make a taking move! Please select a piece to move";
+									click_counter = 0;
+									repaint();
+									return;
+								}
+								else {
+									// else change players
+									prev_locations.clear();
+									prev_direction = -1;
+									players_turn = 1;
+									is_first_move = true;
+									extra_turn_flag = 0;
+									game_message = "Player 1 (Black) select a piece to move";
+									begining_of_move = new Date().getTime();
+									move_counter++;
+								}
+							}
+							repaint();
+							return;
+						}
+						else {
+							if (extra_turn_flag == 1) {
+								// the player took some pieces but then made invalid move
+								game_message = "Invalid move! Player 2 (Red) select where to move ("+move[0]+","+move[1]+") or pass";
+								click_counter = 1;
+							}
+							else {
+								game_message = "That is not a valid move! Player 2 (red) select a peice to move";
+							}
+							repaint();
+							return;
+						}
+					}
+				} // end of click == 2
+				
+				// otherwise we find was point was clicked on the board
+				System.out.println("X: "+x+" Y: "+y);
+				if (x<(piece_diameter/2) || x>(piece_diameter*2*columns+piece_diameter/2)
+					|| y<(piece_diameter/2) || y>(piece_diameter*2*rows+piece_diameter/2)) {
+					System.out.println("invalid!");
+					game_message = "not valid! try again";
 					repaint();
+					return;
 				}
-			} // end of click == 1
+				int x_with_error = x-(piece_diameter/2);
+				int row = (int)(x_with_error / (piece_diameter*2));
+				int y_with_error = y-(piece_diameter/2);
+				int col = (int)(y_with_error / (piece_diameter*2));
+				System.out.println("Row: "+row+" Col: "+col);
+				
+				// now we need to figure out where in the game we are at
+				// if it's the first click in a players move then we need
+				// to store "old x" and "old y" in move array
+				if (click_counter == 0) {
+					// some error checking first
+					if ((players_turn == 1 && game_board_array[row][col] == BLACK)
+						|| (players_turn == 2 && game_board_array[row][col] == RED)) {
+						move[0] = row;
+						move[1] = col;
+						prev_locations.add(move[0]);
+						prev_locations.add(move[1]);
+						click_counter++;
+						game_message = "You have selected to move ("+row+","+col+"), please select where to move. Click this piece again to select another piece to move";
+						repaint();
+					}
+					// if it doesn't meet the requirement then we can let them try again
+					// without updating the counter
+					else {
+						game_message = "("+row+","+col+") is a not valid peice for you!";
+						repaint();
+					}
+				}
+				// is this is click number two, this is where they want to move
+				// so we store "new x" and "new y"
+				else if (click_counter == 1) {
+					// if the user clicks the same piece we want to start over (unless they just took pieces)
+					if (row == move[0] && col == move[1] && extra_turn_flag == 0) {
+						click_counter = 0;
+						if (players_turn == 1) {
+							game_message = "Player 1 (Black) Select a piece to move";
+							repaint();
+							return;
+						}
+						else {
+							game_message = "Player 2 (Red) Select a piece to move";
+							repaint();
+							return;
+						}
+					}
+					// basic error checking
+					if (game_board_array[row][col] == EMPTY) {
+						// complicated error checking
+						// if the point we are sums up to be odd we can only move N, S, E, W
+						// for example (0, 1) would be only be able to move N, W, E, W
+						// since 0+1 = 1 and 1 is odd
+						if ((move[0]+move[1])%2 == 1) {
+							//since we can only move in the same col or row
+							//if BOTH row and col change then its an invalid move
+							if (move[0] != row && move[1] != col) {
+								game_message = "No line to move along, please select a valid empty spot to move ("+move[0]+","+move[1]+")";
+								repaint();
+								return;
+							}
+						}
+						move[2] = row;
+						move[3] = col;
+						click_counter++;
+						// we need to update the game_message and let the user select a direction
+						game_message = "moving ("+move[0]+","+move[1]+") to ("+row+","+col+") Please select a direction to take.";
+						repaint();
+						
+					}
+					// else its not a valid move
+					else {
+						game_message = "("+row+","+col+") is not empty!, select an empty place";
+						repaint();
+					}
+				} // end of click == 1
+				
+			}// end of processClick
 			
-		}// end of processClick
-		
-		public void paintComponent(Graphics g) {//Display board
-			// this has nothing to do with graphics but it
-			// seemed like a good place to check whether or not
-			// we need to remove a sacrificed piece from the board
-			if (player_1_sac_move[0] == 1 && player_1_sac_move[1] == move_counter) {
-				game_board_array[player_1_sac_move[2]][player_1_sac_move[3]] = EMPTY;
-				player_1_sac_move[0] = 0;
+			public void paintComponent(Graphics g) {//Display board
+				// this has nothing to do with graphics but it
+				// seemed like a good place to check whether or not
+				// we need to remove a sacrificed piece from the board
+				if (player_1_sac_move[0] == 1 && player_1_sac_move[1] == move_counter) {
+					game_board_array[player_1_sac_move[2]][player_1_sac_move[3]] = EMPTY;
+					player_1_sac_move[0] = 0;
+				}
+				if (player_2_sac_move[0] == 1 && player_2_sac_move[1] == move_counter) {
+					game_board_array[player_2_sac_move[2]][player_2_sac_move[3]] = EMPTY;
+					player_2_sac_move[0] = 0;
+				}
+				
+				// 'erase' previous message, and put in new message
+				g.setColor(Color.white);
+				g.fillRect(0, 0, width, height);
+				g.setColor(Color.black);
+				g.setFont(new  Font("Serif", Font.BOLD, 14));
+				g.drawString(game_message, x_offset, 20+rows*piece_diameter*2);
+				
+				// calculate time elapsed and print it
+				int total_seconds = (int) (((new Date()).getTime()-starting_time)/1000);
+				minutes = total_seconds/60;
+				seconds = total_seconds-minutes*60;
+				g.drawString(minutes+":"+seconds, columns*piece_diameter*2, 20);
+				
+				// print number of moves
+				g.drawString("Turn Count: "+move_counter, x_offset, 20);
+				
+				// draw the vertical lines
+		        g.setColor(Color.black);
+		        for (int i=0; i<columns; ++i) {
+		        	g.drawLine(x_offset+piece_diameter/2+piece_diameter*2*i, y_offset+piece_diameter/2,
+		        			x_offset+piece_diameter/2+piece_diameter*2*i,
+		        			y_offset-piece_diameter-piece_diameter/2+piece_diameter*2*rows);
+		        }
+		        // draw horizontal lines
+		        for (int i=0; i<rows; ++i) {
+		        	g.drawLine(x_offset+piece_diameter/2, y_offset+piece_diameter/2+piece_diameter*2*i,
+		        			x_offset-piece_diameter-piece_diameter/2+piece_diameter*2*columns,
+		        			y_offset+piece_diameter/2+piece_diameter*2*i);
+		        }
+				// draw slanted (top left to bottom right) lines
+		        for (int i=0; i<(rows-1); ++i) {
+		        	if (i%2 == 0) {
+		        		for (int j=0; j<(columns/2); ++j) {
+		        			g.drawLine(x_offset+(piece_diameter/2)+piece_diameter*4*j,
+		        					y_offset+(piece_diameter/2)+piece_diameter*2*i,
+		        					x_offset+(piece_diameter/2)+piece_diameter*2+piece_diameter*4*j,
+		        					y_offset+(piece_diameter/2)+piece_diameter*2+piece_diameter*2*i);
+		        		}
+		        	}
+		        	else {
+		        		for (int j = 0; j<(columns/2); ++j) {
+		        			g.drawLine(x_offset+(piece_diameter/2)+piece_diameter*2+piece_diameter*4*j,
+		        					y_offset+(piece_diameter/2)+piece_diameter*2*i,
+		        					x_offset+(piece_diameter/2)+piece_diameter*4+piece_diameter*4*j,
+		        					y_offset+(piece_diameter/2)+piece_diameter*2+piece_diameter*2*i);
+		        		}
+		        	}
+		        }
+		        // draw more slanted lines
+		        for (int i=0; i<(rows-1); ++i) {
+		        	if (i%2 == 0) {
+		        		for (int j=0; j<(columns/2); ++j) {
+		        			g.drawLine(x_offset+(piece_diameter/2)+piece_diameter*2+piece_diameter*4*j,
+		        					y_offset+(piece_diameter/2)+piece_diameter*2+piece_diameter*2*i,
+		        					x_offset+(piece_diameter/2)+piece_diameter*4+piece_diameter*4*j,
+		        					y_offset+(piece_diameter/2)+piece_diameter*2*i);
+		        		}
+		        	}
+		        	else {
+		        		for (int j = 0; j<(columns/2); ++j) {
+		        			g.drawLine(x_offset+(piece_diameter/2)+piece_diameter*4*j,
+		        					y_offset+(piece_diameter/2)+piece_diameter*2+piece_diameter*2*i,
+		        					x_offset+(piece_diameter/2)+piece_diameter*2+piece_diameter*4*j,
+		        					y_offset+(piece_diameter/2)+piece_diameter*2*i);
+		        		}
+		        	}
+		        }
+		        
+				// draw the game pieces
+		        for(int i = 0; i<rows; i++) {
+		        	for(int j = 0; j<columns; j++) {
+		        		if(game_board_array[j][i] == RED) {
+		        			g.setColor(Color.red);
+		        			g.fillOval(x_offset+piece_diameter*2*j, y_offset+piece_diameter*2*i, piece_diameter, piece_diameter);
+		        		} else if(game_board_array[j][i] == BLACK) {
+		        			g.setColor(Color.black);
+		        			g.fillOval(x_offset+piece_diameter*2*j, y_offset+piece_diameter*2*i, piece_diameter, piece_diameter);
+		        		} else if(game_board_array[j][i] == EMPTY) {
+		        			// draw nothing
+		        		} else if(game_board_array[j][i] == SACRIFICED) {
+		        			g.setColor(Color.gray);
+		        			g.fillOval(x_offset+piece_diameter*2*j, y_offset+piece_diameter*2*i, piece_diameter, piece_diameter);
+		        		}
+		        	}	        		        
+		        }
+		        
+		        // draw pass button
+		        if (click_counter == 1 && extra_turn_flag == 1) {
+		        	g.setColor(Color.black);
+		        	g.drawRect(x_offset+columns*piece_diameter*2, (rows*piece_diameter), 75, 25);
+		        	g.drawString("Pass", x_offset+columns*piece_diameter*2+7, rows*piece_diameter+17);
+		        }
+		        // draw sacrifice button
+		        if (click_counter == 1 && extra_turn_flag == 0) {
+		        	g.setColor(Color.black);
+		        	g.drawRect(x_offset+columns*piece_diameter*2, (rows*piece_diameter), 75, 25);
+		        	g.drawString("Sacrifice", x_offset+columns*piece_diameter*2+7, rows*piece_diameter+17);
+		        }
+		        // draw take options
+		        if (click_counter == 2) {
+		        	g.setColor(Color.black);
+		        	g.drawRect(x_offset+columns*piece_diameter*2, y_offset, 75, 25);
+		        	g.drawRect(x_offset+columns*piece_diameter*2, y_offset+piece_diameter*2, 75, 25);
+		        	g.drawRect(x_offset+columns*piece_diameter*2, y_offset+piece_diameter*4, 75, 25);
+		        	g.drawString("Forward", x_offset+columns*piece_diameter*2+7, y_offset+17);
+		        	g.drawString("Backward", x_offset+columns*piece_diameter*2+7, y_offset+17+piece_diameter*2);
+		        	g.drawString("No Take", x_offset+columns*piece_diameter*2+7, y_offset+17+piece_diameter*4);
+		        }
 			}
-			if (player_2_sac_move[0] == 1 && player_2_sac_move[1] == move_counter) {
-				game_board_array[player_2_sac_move[2]][player_2_sac_move[3]] = EMPTY;
-				player_2_sac_move[0] = 0;
-			}
-			
-			// 'erase' previous message, and put in new message
-			g.setColor(Color.white);
-			g.fillRect(0, 0, width, height);
-			g.setColor(Color.black);
-			g.setFont(new  Font("Serif", Font.BOLD, 14));
-			g.drawString(game_message, x_offset, 20+rows*piece_diameter*2);
-			
-			// calculate time elapsed and print it
-			int total_seconds = (int) (((new Date()).getTime()-starting_time)/1000);
-			minutes = total_seconds/60;
-			seconds = total_seconds-minutes*60;
-			g.drawString(minutes+":"+seconds, columns*piece_diameter*2, 20);
-			
-			// print number of moves
-			g.drawString("Turn Count: "+move_counter, x_offset, 20);
-			
-			// draw the vertical lines
-	        g.setColor(Color.black);
-	        for (int i=0; i<columns; ++i) {
-	        	g.drawLine(x_offset+piece_diameter/2+piece_diameter*2*i, y_offset+piece_diameter/2,
-	        			x_offset+piece_diameter/2+piece_diameter*2*i,
-	        			y_offset-piece_diameter-piece_diameter/2+piece_diameter*2*rows);
-	        }
-	        // draw horizontal lines
-	        for (int i=0; i<rows; ++i) {
-	        	g.drawLine(x_offset+piece_diameter/2, y_offset+piece_diameter/2+piece_diameter*2*i,
-	        			x_offset-piece_diameter-piece_diameter/2+piece_diameter*2*columns,
-	        			y_offset+piece_diameter/2+piece_diameter*2*i);
-	        }
-			// draw slanted (top left to bottom right) lines
-	        for (int i=0; i<(rows-1); ++i) {
-	        	if (i%2 == 0) {
-	        		for (int j=0; j<(columns/2); ++j) {
-	        			g.drawLine(x_offset+(piece_diameter/2)+piece_diameter*4*j,
-	        					y_offset+(piece_diameter/2)+piece_diameter*2*i,
-	        					x_offset+(piece_diameter/2)+piece_diameter*2+piece_diameter*4*j,
-	        					y_offset+(piece_diameter/2)+piece_diameter*2+piece_diameter*2*i);
-	        		}
-	        	}
-	        	else {
-	        		for (int j = 0; j<(columns/2); ++j) {
-	        			g.drawLine(x_offset+(piece_diameter/2)+piece_diameter*2+piece_diameter*4*j,
-	        					y_offset+(piece_diameter/2)+piece_diameter*2*i,
-	        					x_offset+(piece_diameter/2)+piece_diameter*4+piece_diameter*4*j,
-	        					y_offset+(piece_diameter/2)+piece_diameter*2+piece_diameter*2*i);
-	        		}
-	        	}
-	        }
-	        // draw more slanted lines
-	        for (int i=0; i<(rows-1); ++i) {
-	        	if (i%2 == 0) {
-	        		for (int j=0; j<(columns/2); ++j) {
-	        			g.drawLine(x_offset+(piece_diameter/2)+piece_diameter*2+piece_diameter*4*j,
-	        					y_offset+(piece_diameter/2)+piece_diameter*2+piece_diameter*2*i,
-	        					x_offset+(piece_diameter/2)+piece_diameter*4+piece_diameter*4*j,
-	        					y_offset+(piece_diameter/2)+piece_diameter*2*i);
-	        		}
-	        	}
-	        	else {
-	        		for (int j = 0; j<(columns/2); ++j) {
-	        			g.drawLine(x_offset+(piece_diameter/2)+piece_diameter*4*j,
-	        					y_offset+(piece_diameter/2)+piece_diameter*2+piece_diameter*2*i,
-	        					x_offset+(piece_diameter/2)+piece_diameter*2+piece_diameter*4*j,
-	        					y_offset+(piece_diameter/2)+piece_diameter*2*i);
-	        		}
-	        	}
-	        }
-	        
-			// draw the game pieces
-	        for(int i = 0; i<rows; i++) {
-	        	for(int j = 0; j<columns; j++) {
-	        		if(game_board_array[j][i] == RED) {
-	        			g.setColor(Color.red);
-	        			g.fillOval(x_offset+piece_diameter*2*j, y_offset+piece_diameter*2*i, piece_diameter, piece_diameter);
-	        		} else if(game_board_array[j][i] == BLACK) {
-	        			g.setColor(Color.black);
-	        			g.fillOval(x_offset+piece_diameter*2*j, y_offset+piece_diameter*2*i, piece_diameter, piece_diameter);
-	        		} else if(game_board_array[j][i] == EMPTY) {
-	        			// draw nothing
-	        		} else if(game_board_array[j][i] == SACRIFICED) {
-	        			g.setColor(Color.gray);
-	        			g.fillOval(x_offset+piece_diameter*2*j, y_offset+piece_diameter*2*i, piece_diameter, piece_diameter);
-	        		}
-	        	}	        		        
-	        }
-	        
-	        // draw pass button
-	        if (click_counter == 1 && extra_turn_flag == 1) {
-	        	g.setColor(Color.black);
-	        	g.drawRect(x_offset+columns*piece_diameter*2, (rows*piece_diameter), 75, 25);
-	        	g.drawString("Pass", x_offset+columns*piece_diameter*2+7, rows*piece_diameter+17);
-	        }
-	        // draw sacrifice button
-	        if (click_counter == 1 && extra_turn_flag == 0) {
-	        	g.setColor(Color.black);
-	        	g.drawRect(x_offset+columns*piece_diameter*2, (rows*piece_diameter), 75, 25);
-	        	g.drawString("Sacrifice", x_offset+columns*piece_diameter*2+7, rows*piece_diameter+17);
-	        }
-	        // draw take options
-	        if (click_counter == 2) {
-	        	g.setColor(Color.black);
-	        	g.drawRect(x_offset+columns*piece_diameter*2, y_offset, 75, 25);
-	        	g.drawRect(x_offset+columns*piece_diameter*2, y_offset+piece_diameter*2, 75, 25);
-	        	g.drawRect(x_offset+columns*piece_diameter*2, y_offset+piece_diameter*4, 75, 25);
-	        	g.drawString("Forward", x_offset+columns*piece_diameter*2+7, y_offset+17);
-	        	g.drawString("Backward", x_offset+columns*piece_diameter*2+7, y_offset+17+piece_diameter*2);
-	        	g.drawString("No Take", x_offset+columns*piece_diameter*2+7, y_offset+17+piece_diameter*4);
-	        }
-		}
 
-		public void mousePressed(MouseEvent e) {
-			System.out.println("mouse pressed");
-			processClick(e.getX(), e.getY());
+			public void mousePressed(MouseEvent e) {
+				System.out.println("mouse pressed");
+				processClick(e.getX(), e.getY());
+			}
+			
+			public void mouseClicked(MouseEvent e) {}
+			public void mouseEntered(MouseEvent e) {}
+			public void mouseExited(MouseEvent e) {}
+			public void mouseReleased(MouseEvent e) {}
+			public void actionPerformed(ActionEvent e) {}
 		}
 		
-		public void mouseClicked(MouseEvent e) {}
-		public void mouseEntered(MouseEvent e) {}
-		public void mouseExited(MouseEvent e) {}
-		public void mouseReleased(MouseEvent e) {}
-		public void actionPerformed(ActionEvent e) {}
+		public void create_window() {
+			window = new JFrame("Fanorona");
+			window.setTitle("Fanorona Game");
+			window.setBounds(400, 0, 950, 850);
+			window.setResizable(true);
+			window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);		
+			window.setVisible(true);
+			starting_time = (new Date()).getTime();
+			window.add(graphics);
+			graphics.addMouseListener(graphics);
+		}
 	}
-	
-	public void create_window() {
-		window = new JFrame("Fanorona");
-		window.setTitle("Fanorona Game");
-		window.setBounds(400, 0, 950, 850);
-		window.setResizable(true);
-		window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);		
-		window.setVisible(true);
-		starting_time = (new Date()).getTime();
-		window.add(graphics);
-		graphics.addMouseListener(graphics);
-	}
-}
 
